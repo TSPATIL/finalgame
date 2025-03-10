@@ -1,0 +1,732 @@
+/* Importing Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@300;400&display=swap');
+
+/* General Styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    box-sizing: border-box;
+    background-color: #f0f0f0;
+}
+
+.logo {
+    font-family: 'Poppins', sans-serif; /* Font family */
+    font-size: 2.5rem; /* Font size for the logo */
+    color: #fff; /* White color for contrast */
+    position: relative; /* Position relative for animation */
+    text-transform: uppercase; /* Make the logo uppercase */
+    animation: glow 1.5s infinite alternate; /* Glow animation */
+}
+
+/* Glow Effect Animation */
+@keyframes glow {
+    0% {
+        text-shadow: 0 0 5px rgba(173, 216, 230, 0.8), 0 0 10px rgba(173, 216, 230, 0.7), 0 0 15px rgba(173, 216, 230, 0.6);
+    }
+    50% {
+        text-shadow: 0 0 10px rgba(173, 216, 230, 1), 0 0 20px rgba(173, 216, 230, 1), 0 0 30px rgba(173, 216, 230, 1);
+    }
+    100% {
+        text-shadow: 0 0 5px rgba(173, 216, 230, 0.8), 0 0 10px rgba(173, 216, 230, 0.7), 0 0 15px rgba(173, 216, 230, 0.6);
+    }
+}
+
+/* Optional: Adding a hover effect */
+.logo:hover {
+    animation: bounce 0.5s; /* Bounce effect on hover */
+}
+
+/* Bounce Animation */
+@keyframes bounce {
+    0% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-5px);
+    }
+    50% {
+        transform: translateY(0);
+    }
+    70% {
+        transform: translateY(-2px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+
+/* Navigation Bar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    --rebecca-purple: hsl(270, 60%, 15%);
+  background-image: linear-gradient(
+    to bottom right, 
+    hsla(286, 61%, 57%, 0.25), 
+    var(--rebecca-purple), 
+    hsla(208, 73%, 41%, 0.25)
+  );
+  background-color: var(--rebecca-purple);
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links li a, .nav-links li button {
+    text-decoration: none;
+    color: #fff; /* White color for better contrast */
+    font-family: 'Poppins', sans-serif; /* Font family */
+    font-weight: 600;
+    position: relative; /* Position relative for animation */
+    display: inline-block; /* Ensure the links are inline-block for padding */
+    margin: 0 10px; /* Space between links */
+    animation: fadeIn 2s ease-in-out; /* Fade-in animation */
+}
+
+/* New Animation for navigation links */
+@keyframes fadeIn {
+    0% {
+        opacity: 0; /* Start invisible */
+        transform: translateY(-10px); /* Slide down slightly */
+    }
+    100% {
+        opacity: 1; /* Fully visible */
+        transform: translateY(0); /* Move to original position */
+    }
+}
+
+/* Add a glow effect to links */
+.nav-links li a::before, .nav-links li button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(173, 216, 230, 0.2); /* Light blue glow */
+    border-radius: 5px; /* Rounded corners */
+    filter: blur(8px); /* Soft glow effect */
+    z-index: -1; /* Behind the text */
+    opacity: 0; /* Start invisible */
+    transition: opacity 0.3s ease; /* Transition for glow effect */
+}
+
+.nav-links li a:hover::before, .nav-links li button:hover::before {
+    opacity: 1; /* Show glow effect on hover */
+}
+
+
+.explore-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #9f129f, #a317ce); /* Gradient background */
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 5px 15px rgba(159, 18, 159, 0.4); /* Initial shadow */
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.explore-btn::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300%;
+    height: 300%;
+    background: rgba(188, 45, 188, 0.2);
+    transition: all 0.4s ease;
+    border-radius: 50%;
+    z-index: -1;
+    transform: translate(-50%, -50%) scale(0);
+}
+
+.explore-btn:hover::before {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.explore-btn:hover {
+    background: linear-gradient(135deg, #730271, #9f129f); /* Reverse gradient on hover */
+    box-shadow: 0 8px 20px rgba(159, 18, 159, 0.6); /* Larger shadow on hover */
+}
+
+.hero {
+    position: relative;
+    height: 100vh; /* Full viewport height */
+    display: flex; /* Use flexbox for alignment */
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    overflow: hidden; /* Hide overflow for the diagonal effect */
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #0a7174, #56028f); /* Gradient colors */
+    background-size: 200% 200%; /* Double the background size for animation */
+    animation: slideBackground 5s linear infinite; /* Animation */
+    z-index: 1; /* Background below the text and image */
+}
+
+.hero-text {
+    position: relative; /* Position relative to the hero */
+    z-index: 2; /* Ensure text is above the background */
+    text-align: center; /* Center text */
+    color: #fff; /* Change text color for better contrast */
+}
+
+.hero-image {
+    position: relative; /* Ensure the image is positioned above the background */
+    z-index: 2; /* Ensure image is above the background */
+    max-width: 500px; /* Adjust max width as necessary */
+    margin-left: 20px; /* Add some margin for spacing */
+}
+
+.hero-image img {
+    width: 100%;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Animation for the diagonal background */
+@keyframes slideBackground {
+    0% {
+        background-position: 0% 50%; /* Start from the left */
+    }
+    100% {
+        background-position: 100% 50%; /* Slide to the right */
+    }
+}
+
+
+.hero-text h1 {
+    font-size: 2.5rem;
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
+.hero-text p {
+    font-size: 1.2rem; /* Adjust size as needed */
+    margin-top: 20px;
+    color: rgba(255, 255, 255, 0.9); /* Slightly transparent white for better contrast */
+    font-family: 'Poppins', sans-serif; /* Change font family */
+    position: relative; /* Position relative for animation */
+    animation: fadeIn 2s ease-in-out; /* Fade-in animation */
+}
+
+/* New Animation for the paragraph */
+@keyframes fadeIn {
+    0% {
+        opacity: 0; /* Start invisible */
+        transform: translateY(20px); /* Slide up slightly */
+    }
+    100% {
+        opacity: 1; /* Fully visible */
+        transform: translateY(0); /* Move to original position */
+    }
+}
+
+/* Add a glow effect */
+.hero-text p::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(173, 216, 230, 0.2); /* Light blue glow */
+    border-radius: 5px; /* Rounded corners */
+    filter: blur(8px); /* Soft glow effect */
+    z-index: -1; /* Behind the text */
+}
+
+
+.cta-btn {
+    padding: 15px 25px;
+    background: transparent; /* Transparent background */
+    color: #00aaff; /* Blue text */
+    border: 2px solid #00aaff; /* Initial solid blue border */
+    border-radius: 5px;
+    text-decoration: none;
+    margin-top: 30px;
+    top: 30px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    position: relative; 
+    overflow: hidden;
+    transition: color 0.4s ease; /* Smooth color transition */
+}
+
+.cta-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    box-sizing: border-box; /* To ensure the border doesn't affect size */
+    transition: all 0.4s ease;
+}
+
+.cta-btn:hover::before {
+    border-color: #00aaff; /* Blue border expands on hover */
+}
+
+.cta-btn:hover {
+    color: #005f99; /* Slightly darker blue text on hover */
+}
+
+
+/* Hero Image Hover Effect */
+.hero-image img {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hero-image img:hover {
+    transform: scale(1.05); /* Slightly enlarge the image */
+    box-shadow: 0 0 20px rgba(64, 169, 211, 0.8); /* Golden glow effect */
+}
+
+/* Exploration Section */
+.exploration {
+    text-align: center;
+    padding: 60px 30px;
+    color: #fff; /* White text for contrast against the dark background */
+    position: relative; /* Position relative for the ::before pseudo-element */
+    overflow: hidden; /* Hide overflow for the background animation */
+}
+
+/* Dark-themed animated background */
+.exploration::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #26014a, #100e12, #ad04aa); /* Initial dark gradient */
+    background-size: 300% 300%; /* Increase background size for smooth animation */
+    animation: slideBackground 10s ease-in-out infinite; /* Apply animation */
+    z-index: 0; /* Ensure background is behind content */
+}
+
+/* Keyframes for the sliding diagonal effect */
+@keyframes slideBackground {
+    0% {
+        background-position: 0% 50%; /* Start from left */
+    }
+    50% {
+        background-position: 100% 0%; /* Slide diagonally to the right */
+    }
+    100% {
+        background-position: 0% 50%; /* Return to start */
+    }
+}
+
+.exploration h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    position: relative; /* For text layering above the background */
+    z-index: 1; /* Ensure the heading is above the background */
+}
+
+.explore-box {
+    display: flex;
+    margin: 20px 0;
+    justify-content: space-around;
+    align-items: center;
+    position: relative; /* For positioning above the background */
+    z-index: 1; /* Ensure content is above the background */
+}
+
+.explore-image img {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.explore-image img:hover {
+    transform: scale(1.05); /* Slightly enlarge the image */
+    box-shadow: 0 0 20px rgba(67, 184, 216, 0.8); /* Golden glow effect */
+}
+
+.explore-content {
+    max-width: 500px;
+}
+
+.explore-content h3 {
+    font-size: 1.5rem;
+    color: #eee; /* Light gray for better contrast */
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
+.explore-content p {
+    font-size: 1rem;
+    color: #ccc; /* Lighter gray for readability */
+    font-family: 'Roboto', sans-serif;
+}
+
+
+/* Call to Action Section */
+/* Call to Action Section */
+.cta-section {
+    display: flex;
+    justify-content: space-between;
+    padding: 100px;
+    position: relative; /* Position relative for the ::before pseudo-element */
+    overflow: hidden; /* Hide overflow for the background animation */
+}
+
+/* Background animation */
+.cta-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #6f31d3, #320a3a, #e8b0b0); /* Initial gradient colors */
+    background-size: 300% 300%; /* Increase background size for smooth animation */
+    animation: slideBackground 10s ease-in-out infinite; /* Apply animation */
+    z-index: 0; /* Ensure background is behind content */
+}
+
+/* Keyframes for the sliding diagonal effect */
+@keyframes slideBackground {
+    0% {
+        background-position: 0% 50%; /* Start from left */
+    }
+    50% {
+        background-position: 100% 0%; /* Slide diagonally to the right */
+    }
+    100% {
+        background-position: 0% 50%; /* Return to start */
+    }
+}
+
+.cta-image img {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative; /* Ensure image is above the background */
+    z-index: 1; /* Ensure image is above the background */
+}
+
+.cta-image img:hover {
+    transform: scale(1.05); /* Slightly enlarge the image */
+    box-shadow: 0 0 20px rgba(80, 164, 216, 0.8); /* Golden glow effect */
+}
+
+.cta-text {
+    z-index: 1;
+    padding: 0 20px; /* Ensure text is above the background */
+}
+
+.cta-text h2 {
+    font-size: 2rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    position: relative; /* For text layering above the background */
+}
+
+.cta-text p {
+    margin-top: 20px;
+    color: #000000;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Footer */
+footer {
+    position: relative; /* Position relative for the ::before pseudo-element */
+    padding: 20px;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    overflow: hidden; /* Hide overflow for the background animation */
+    color: white; /* White text for contrast */
+}
+
+/* Background animation for footer */
+footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #3f026e, #2b0a1d, #220223); /* Dark gradient colors */
+    background-size: 300% 300%; /* Increase background size for smooth animation */
+    animation: slideBackground 10s ease-in-out infinite; /* Apply animation */
+    z-index: 0; /* Ensure background is behind content */
+}
+
+/* Keyframes for the sliding diagonal effect */
+@keyframes slideBackground {
+    0% {
+        background-position: 0% 50%; /* Start from left */
+    }
+    50% {
+        background-position: 100% 0%; /* Slide diagonally to the right */
+    }
+    100% {
+        background-position: 0% 50%; /* Return to start */
+    }
+}
+
+/* Footer links styles */
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+    position: relative; /* For text layering above the background */
+    z-index: 1; /* Ensure links are above the background */
+}
+
+.footer-links ul li {
+    display: inline;
+    margin: 0 10px;
+}
+
+.footer-links ul li a,
+.social-links ul li a {
+    color: white; /* Color for better contrast */
+    text-decoration: none; /* Remove underline from links */
+}
+
+.social-links ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+    position: relative; /* For text layering above the background */
+    z-index: 1; /* Ensure links are above the background */
+}
+
+.social-links ul li {
+    display: inline;
+    margin: 0 10px;
+}
+
+/* Optional: Add hover effects for links */
+.footer-links ul li a:hover,
+.social-links ul li a:hover {
+    text-decoration: underline; /* Underline on hover for better visibility */
+}
+
+
+/* Sparkle Effect CSS */
+.sparkle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: rgba(32, 155, 250, 0.8); /* Golden sparkle */
+    border-radius: 50%;
+    pointer-events: none;
+    animation: sparkle 0.5s ease-out;
+}
+
+@keyframes sparkle {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0);
+        opacity: 0; /* Fade out */
+    }
+}
+
+.explore-image img:hover,
+.hero-image img:hover,
+.cta-image img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(27, 166, 209, 0.8);
+    border: 5px solid rgba(37, 135, 255, 0.8); /* Golden border */
+    border-radius: 10px; /* Match the image border-radius */
+}
+
+/* Include the bounce animation CSS above */
+
+@keyframes bounce {
+    0% {
+        transform: scale(1);
+    }
+    30% {
+        transform: scale(1.1);
+    }
+    50% {
+        transform: scale(0.9);
+    }
+    70% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.explore-image img.bounce,
+.hero-image img.bounce,
+.cta-image img.bounce {
+    animation: bounce 0.5s ease forwards;
+}
+
+/* Other existing styles... */
+/* Other existing styles... */
+
+/* Shimmer Animation */
+@keyframes shimmer {
+    0% {
+        text-shadow: 0 0 5px rgba(151, 71, 243, 0.5), 0 0 10px rgba(38, 129, 213, 0.7), 0 0 15px rgb(137, 45, 212);
+    }
+    50% {
+        text-shadow: 0 0 10px rgba(43, 49, 233, 0.8), 0 0 20px rgb(89, 114, 227), 0 0 30px rgb(4, 62, 254);
+    }
+    100% {
+        text-shadow: 0 0 5px rgba(60, 188, 231, 0.5), 0 0 10px rgba(121, 180, 223, 0.7), 0 0 15px rgb(100, 76, 216);
+    }
+}
+
+/* Bounce Animation */
+@keyframes bounce {
+    0% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-5px);
+    }
+    50% {
+        transform: translateY(0);
+    }
+    70% {
+        transform: translateY(-2px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* Hero Section Text Style */
+.hero-text h1 {
+    animation: shimmer 1.5s infinite alternate, bounce 1s ease infinite; /* Apply both effects */
+    color: #333; /* Ensure visibility */
+}
+/* Other existing styles... */
+
+/* Blue Shimmer Animation */
+@keyframes blueShimmer {
+    0% {
+        text-shadow: 0 0 5px rgba(0, 170, 255, 0.5), 0 0 10px rgba(0, 170, 255, 0.7), 0 0 15px rgba(0, 170, 255, 1);
+    }
+    50% {
+        text-shadow: 0 0 10px rgba(0, 170, 255, 0.8), 0 0 20px rgba(0, 170, 255, 1), 0 0 30px rgba(0, 170, 255, 1);
+    }
+    100% {
+        text-shadow: 0 0 5px rgba(0, 170, 255, 0.5), 0 0 10px rgba(0, 170, 255, 0.7), 0 0 15px rgba(0, 170, 255, 1);
+    }
+}
+
+/* Bounce Animation */
+@keyframes bounce {
+    0% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-5px);
+    }
+    50% {
+        transform: translateY(0);
+    }
+    70% {
+        transform: translateY(-2px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* Exploration Section Title Style */
+.exploration h2 {
+    animation: blueShimmer 1.5s infinite alternate, bounce 1s ease infinite; /* Apply both effects */
+    color: #00aaff; /* Bright blue color */
+}
+
+
+
+
+@import url(https://fonts.googleapis.com/css?family=Lato:600);
+
+.rotating-text-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Adjust if needed */
+    position: relative;
+}
+
+.rotating-text {
+    font-family: Lato, sans-serif;
+    font-weight: 600;
+    font-size: 36px;
+    color: white;
+    overflow: hidden; /* Prevent overflow of letters */
+}
+
+.rotating-text p {
+    display: inline-flex;
+    margin: 0;
+    vertical-align: top;
+    position: relative; /* Required for absolute positioning of letters */
+}
+
+.word {
+    position: absolute;
+    display: flex;
+    opacity: 0; /* Initially hidden */
+}
+
+.letter {
+    transform-origin: center center 25px;
+}
+
+.letter.out {
+    transform: rotateX(90deg);
+    transition: 0.32s cubic-bezier(0.6, 0, 0.7, 0.2);
+}
+
+.letter.in {
+    transition: 0.38s ease;
+}
+
+.letter.behind {
+    transform: rotateX(-90deg);
+}
+

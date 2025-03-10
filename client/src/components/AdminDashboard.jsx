@@ -2,11 +2,12 @@ import React from 'react'
 import {
     Link
 } from 'react-router-dom'
+import AdminNavbar from './AdminNavbar'
 
 export default function AdminDashboard() {
     return (
         <div className='AdminDashboard'>
-                <div class="flex justify-center items-center bg-gray-800 w-full h-screen">
+                {/* <div class="flex justify-center items-center bg-gray-800 w-full h-screen">
                     <div class="absolute top-0 left-0 sm:relative z-20 w-[90vw] sm:w-[300px] h-full bg-gray-900 rounded p-3 shadow-xl">
                         <div class="flex items-center space-x-4 p-2 mb-5">
                             <img class="h-12 rounded-full" src="/user.png" alt="James Bhatta" />
@@ -120,7 +121,8 @@ export default function AdminDashboard() {
                             
                         </div>
                     </div>
-                </div>
+                </div> */}
+                <AdminNavbar/>
         </div>
     )
 }

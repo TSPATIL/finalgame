@@ -1,10 +1,34 @@
 import React, { useState } from 'react'
 import { BsEnvelope } from "react-icons/bs";
+import Footer from './Footer';
+import { useDispatch, useSelector } from 'react-redux'
+import { addContactAsync, selectLoading } from '../Redux/features/Contact/ContactSlice';
+import { showAlert } from '../Redux/features/Alerts/AlertSlice';
 
 export default function Contact() {
     const [contactDetails, setContactDetails] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
     const handleOnChange = (e) => {
         setContactDetails({ ...contactDetails, [e.target.name]: e.target.value });
+    }
+    const dispatch = useDispatch();
+    const loading = useSelector(selectLoading);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await dispatch(addContactAsync(contactDetails));
+            const data = response.payload;
+            if (data.status) {
+                dispatch(showAlert({ message: "Contact saved", type: "success" }));
+                setContactDetails({ name: '', email: '', phone: '', subject: '', message: '' })
+            }
+            else {
+                dispatch(showAlert({ message: data.message, type: "error" }));
+            }
+
+        } catch (error) {
+            dispatch(showAlert({ message: "Something went wrong", type: "error" }));
+        }
+
     }
     return (
         <div className='Contact overflow-hidden'>
@@ -21,7 +45,7 @@ export default function Contact() {
                 <div class="max-w-5xl mx-auto px-6 sm:px-6 lg:px-8 mb-12">
                     <div class="bg-gray-900 w-full shadow rounded p-8 sm:p-12 -mt-60 sm:-mt-52 md:-mt-40">
                         <p class="text-3xl font-bold leading-7 text-center text-white">Contact us</p>
-                        <form>
+                        <form onSubmit={handleSubmit}>
                             <div class="md:flex items-center mt-12">
                                 <div class="w-full md:w-1/2 flex flex-col">
                                     <label class="font-semibold leading-none text-gray-300" htmlFor='email'>Name</label>
@@ -35,35 +59,36 @@ export default function Contact() {
                             <div class="md:flex items-center mt-4 md:mt-8">
                                 <div class="w-full md:w-1/2 flex flex-col">
                                     <label class="font-semibold leading-none text-gray-300" htmlFor='phone'>Phone</label>
-                                    <input type="text" id='phone' name='phone' value={contactDetails.phone} onChange={handleOnChange} class="leading-none text-gray-50 p-3 focus:outline-none focus:border-blue-700 mt-4 border-0 bg-gray-800 rounded" />
+                                    <input type="text" id='phone' name='phone' value={contactDetails.phone} onChange={handleOnChange} maxLength={10} minLength={10} class="leading-none text-gray-50 p-3 focus:outline-none focus:border-blue-700 mt-4 border-0 bg-gray-800 rounded" />
                                 </div>
                                 <div class="w-full md:w-1/2 flex flex-col md:ml-6 md:mt-0 mt-4">
                                     <label class="font-semibold leading-none text-gray-300" htmlFor='subject'>Subject</label>
                                     <input type="text" id='subject' name='subject' value={contactDetails.subject} onChange={handleOnChange} class="leading-none text-gray-50 p-3 focus:outline-none focus:border-blue-700 mt-4 border-0 bg-gray-800 rounded" />
                                 </div>
                             </div>
-                            {/*<div class="md:flex items-center mt-8">
-                                <div class="w-full flex flex-col">
-                                    <label class="font-semibold leading-none text-gray-300">Subject</label>
-                                    <input type="text" class="leading-none text-gray-50 p-3 focus:outline-none focus:border-blue-700 mt-4 border-0 bg-gray-800 rounded" />
-                                </div>
-                            </div> */}
                             <div>
                                 <div class="w-full flex flex-col mt-4 md:mt-8">
                                     <label class="font-semibold leading-none text-gray-300" htmlFor='message'>Message</label>
-                                    <textarea type="text" id='message' name='message' value={contactDetails.name} onChange={handleOnChange} class="h-40 text-base leading-none text-gray-50 p-3 focus:outline-none focus:border-blue-700 mt-4 bg-gray-800 border-0 rounded"></textarea>
+                                    <textarea type="text" id='message' name='message' value={contactDetails.message} onChange={handleOnChange} class="h-40 text-base leading-none text-gray-50 p-3 focus:outline-none focus:border-blue-700 mt-4 bg-gray-800 border-0 rounded"></textarea>
                                 </div>
                             </div>
                             <div class="flex items-center justify-center w-full">
-                                <button class="mt-9 font-semibold leading-none flex justify-center items-center text-white py-4 px-10 bg-blue-700 rounded hover:bg-blue-600 focus:ring-2 focus:ring-offset-2 focus:ring-blue-700 focus:outline-none">
+                                <button type='submit' disabled={loading} class="mt-9 font-semibold leading-none flex justify-center items-center text-white py-4 px-10 bg-blue-700 rounded hover:bg-blue-600 focus:ring-2 focus:ring-offset-2 focus:ring-blue-700 focus:outline-none">
                                     <BsEnvelope className='text-2xl text-white mr-2 font-bold' />
-                                    <p>Send message</p>
+                                    {
+                                        !loading
+                                            ?
+                                            <p>Send message</p>
+                                            :
+                                            <p>Loading...</p>
+                                    }
                                 </button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
+            <Footer />
         </div>
     )
 }

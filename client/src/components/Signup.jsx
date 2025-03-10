@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   signUpWithPassword,
   signInWithGoogle,
@@ -8,13 +8,18 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import {
   createUserAsync,
+  googleLoginUserAsync,
   resetStatus,
   selectLoading,
   selectStatus,
   selectUser,
 } from "../Redux/features/Authentication/AuthenticationSlice";
+import Spinner from "./Spinner";
+import { showAlert } from "../Redux/features/Alerts/AlertSlice";
+import Footer from "./Footer";
 
 export default function Signup() {
+  const navigate = useNavigate();
   const [credentials, setCredentials] = useState({
     name: "",
     email: "",
@@ -29,70 +34,90 @@ export default function Signup() {
   };
   const handleOnSubmit = async (e) => {
     e.preventDefault();
-    if (!validateFullName(credentials.name)) {
-      alert("Write full name");
+    if (!validateFullName(credentials.name.trim())) {
+      dispatch(showAlert({message: "Write full name", type: "info"}));
     } else {
       const result = await signUpWithPassword(credentials);
       if (result && !result.error) {
         const resulttoken = await result.getIdToken()
-        console.log(resulttoken)
         try {
           const userData = {
-            name: credentials.name,
-            email: result.email,
+            name: credentials.name.trim(),
+            email: result.email.trim(),
             password: credentials.password,
-            image: result.photoURL,
+            uid: result.uid,
             userType: "student",
-            token: resulttoken
+            token: resulttoken,
+            refreshToken: result.refreshToken
           };
           const response = await dispatch(createUserAsync(userData));
-          alert("User created successfully");
+        if(response.error){
+          throw new Error(response.error);
+        }
+          navigate('/');
+          dispatch(showAlert({message: "User Sign-up Successful", type: "success"}));
         } catch (error) {
-          alert("Error occured");
+          dispatch(showAlert({message: "User Sign-up failed", type: "error"}));
           console.error(error);
         }
       } else {
         console.error("User Sign-up failed:", result.error);
+        dispatch(showAlert({message: "User Sign-up failed", type: "error"}));
       }
     }
   };
   const dispatch = useDispatch();
   const loading = useSelector(selectLoading);
-  const user = useSelector(selectUser);
+  // const user = useSelector(selectUser);
+
   const handleGoogleLogin = async () => {
     const result = await signInWithGoogle();
     if (result && !result.error) {
+      const resulttoken = await result.getIdToken()
       try {
-        const response = await dispatch(createUserAsync(credentials));
-        alert("User created successfully");
+        const userData = {
+          name: result.displayName,
+          email: result.email,
+          userType: "student",
+          uid: result.uid,
+          token: resulttoken,
+          refreshToken: result.refreshToken
+        };
+        const response = await dispatch(googleLoginUserAsync(userData));
+        if(response.error){
+          throw new Error(response.error);
+        }
+        dispatch(showAlert({message: "User Sign-in Successful", type: "success"}));
+        navigate('/')
       } catch (error) {
-        alert("Error occured");
+        dispatch(showAlert({message: "User Sign-in failed", type: "error"}));
         console.error(error);
       }
     } else {
       console.error("Google Sign-In failed:", result.error);
+      dispatch(showAlert({message: "User Sign-in failed", type: "error"}));
     }
   };
-//   console.log(user);
+  //   console.log(user);
   return (
-    <div className="w-screen h-screen overflow-hidden bg-[#D06D6D]">
-      <div className="flex justify-end items-center">
-        <div className="">
+    <div className="w-full h-full overflow-hidden bg-[#D06D6D]">
+      <div className="flex justify-end items-center h-full w-full">
+        <div className="h-full w-[56%]">
           <img
             src="./login.png"
             alt=""
             className="w-[950px] h-[425px] absolute bottom-0 left-[60px]"
           />
           <div className="absolute w-[600px] h-[255px] top-[99px] left-[101px]">
-            <div className="absolute w-[588px] top-0 left-5 font-serif font-medium text-black text-[115px] leading-[normal] whitespace-nowrap shadow-drop-shadow-100">
+            <div className="absolute w-[588px] top-0 left-0 [-webkit-text-stroke:2px_#000000] font-medium text-black text-[120px] tracking-[0] leading-[normal] whitespace-nowrap shadow-drop-shadow-100">
               Qᵘᵉʳʸ ᶜʳᵃᶠᵗ
             </div>
-            <div className="absolute w-[528px] top-[100px] font-serif left-[325px] text-black text-[30px] font-bold tracking-[0] leading-[normal]">
+            <div className="absolute w-[528px] top-[100px] left-[375px] text-black text-[30px] font-bold tracking-[0] leading-[normal]">
               The Hogwarts Enigma
             </div>
           </div>
         </div>
-        <div className="login-side w-[45%] h-screen bg-[#EDC6C6]">
+        <div className="login-side w-[44%] h-screen bg-[#EDC6C6]">
           {!loading ? (
             <div className="flex justify-center items-center flex-col h-full">
               <h1 className="text-3xl font-bold mb-7">Create your Account</h1>
@@ -142,7 +167,7 @@ export default function Signup() {
                     value={credentials.password}
                     onChange={handleInputChange}
                     id="password"
-                    required 
+                    required
                     pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{8,}"
                     title="Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character."
                     placeholder="Password"
@@ -167,10 +192,15 @@ export default function Signup() {
               </div>
             </div>
           ) : (
-            <div>Loading...</div>
+            <div className="flex justify-center items-center h-screen">
+              <Spinner
+                fontSize="60px"
+              />
+            </div>
           )}
         </div>
       </div>
+      <Footer/>
     </div>
   );
 }

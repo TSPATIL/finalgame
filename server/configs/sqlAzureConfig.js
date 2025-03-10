@@ -13,4 +13,18 @@ const sqlAzureConfig = {
     }
 }
 
+const sqlconnect = async ()=>{
+    try{
+        console.log(sqlAzureConfig)
+        const pool = await sql.connect(sqlAzureConfig);
+        console.log(pool);
+    }
+    catch(error){
+        console.log("not connected")
+        console.log(error)
+    }
+}
+
 module.exports = sqlAzureConfig;
+
+module.exports = sqlconnect;

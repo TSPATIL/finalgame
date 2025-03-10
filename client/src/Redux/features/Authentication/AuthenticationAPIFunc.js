@@ -1,11 +1,11 @@
-// A mock function to mimic making an async request for data
+//user
 export function createUser(userData) {
-    return new Promise(async (resolve) => {
-        const response = await fetch("http://127.0.0.1:5000/api/user/create-user", {
+    return new Promise(async (resolve, reject) => {
+        const response = await fetch("http://localhost:5000/api/user/create-user", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                'Authorization': `Bearer ${userData.token}`,
+                // 'Authorization': `Bearer ${userData.token}`,
             },
             body: JSON.stringify(userData),
             credentials: 'include'
@@ -20,12 +20,12 @@ export function createUser(userData) {
 }
 
 export function loginUser(userData) {
-    return new Promise(async (resolve) => {
-        const response = await fetch("http://127.0.0.1:5000/api/user/login-user", {
+    return new Promise(async (resolve, reject) => {
+        const response = await fetch("http://localhost:5000/api/user/login-user", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                'Authorization': `Bearer ${userData.token}`,
+                // 'Authorization': `Bearer ${userData.token}`,
             },
             body: JSON.stringify(userData),
             credentials: 'include'
@@ -39,22 +39,61 @@ export function loginUser(userData) {
     );
 }
 
-export async function getAllUsers(){
-    try {
-        const response = await fetch("http://127.0.0.1:5000/api/user/getallusers", {
-            method: "GET",
+export function googleLoginUser(userData) {
+    return new Promise(async (resolve, reject) => {
+        const response = await fetch("http://localhost:5000/api/user/google-login-user", {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                'Authorization': `Bearer ${userData.token}`,
+                // 'Authorization': `Bearer ${userData.token}`,
             },
             body: JSON.stringify(userData),
             credentials: 'include'
         })
-        const data = await response.json(); // Parse the JSON response
+        const data = await response.json()
+        if(data.error){
+            reject(data.error);
+        }
+        resolve({ data });
+    }
+    );
+}
 
-        // Check if the response was successful
+export async function logoutUser(){
+    try {
+        const response = await fetch("http://localhost:5000/api/user/logout", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include"
+        })
+        const data = await response.json();
+        if (data.error) {
+            throw new Error(data.error || 'Logout failed'); // Throw an error if the status isn't OK
+        }
+        return {status: true, message: data};
+    } catch (error) {
+        consol.log(error)
+        return {status: false, message: error.message, error};
+    }
+}
+
+export async function getAllUsers(){
+    try {
+        const response = await fetch("http://localhost:5000/api/user/getallusers", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                // 'Authorization': `Bearer ${userData.token}`,
+            },
+            body: JSON.stringify(userData),
+            credentials: 'include'
+        })
+        const data = await response.json(); 
+
         if (!response.ok) {
-            throw new Error(data.error || 'Login failed'); // Throw an error if the status isn't OK
+            throw new Error(data.error || 'Fetching details failed'); // Throw an error if the status isn't OK
         }
 
         return data; // Return the successful response data
@@ -65,34 +104,31 @@ export async function getAllUsers(){
 
 export async function getUserDetails(){
     try {
-        const response = await fetch("http://127.0.0.1:5000/api/user/getuserdetails", {
+        const response = await fetch("http://localhost:5000/api/user/getuserdetails", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                'Authorization': `Bearer ${userData.token}`,
             },
-            body: JSON.stringify(userData),
             credentials: 'include'
         })
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error || 'Login failed');
+            throw new Error(data.error || 'Information fetching failed');
         }
-
         return data;
     } catch (error) {
-        throw new Error(error.message || 'Network error occurred');
+        return {status: false, error: error.message || 'Network error occurred'};
     }
 }
 
 export async function getUserDetailsByParams(){
     try {
-        const response = await fetch("http://127.0.0.1:5000/api/user/getuserdetailsbyadmin", {
+        const response = await fetch("http://localhost:5000/api/user/getuserdetailsbyadmin", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                'Authorization': `Bearer ${userData.token}`,
+                // 'Authorization': `Bearer ${userData.token}`,
             },
             body: JSON.stringify(userData),
             credentials: 'include'
@@ -109,3 +145,94 @@ export async function getUserDetailsByParams(){
     }
 }
 
+export async function updateUserDetails(userData){
+    try{
+        for (let [key, value] of userData.entries()) {
+            console.log(key, value);
+        }
+        const response = await fetch("http://localhost:5000/api/user/updateUserDetails", {
+            method: "PATCH",
+            headers: {
+                // "Content-Type": "multipart/form-data",
+            },
+            body: userData,
+            credentials: 'include'
+        })
+        const data = await response.json();
+
+        if (data.error) {
+            throw new Error(data.error || 'Data failed to save');
+        }
+
+        return data;
+    }
+    catch(error){
+        throw new Error(error.message || 'Network error occurred');
+    }
+}
+
+//admin
+export async function createAdmin(adminDetails){
+    try{
+        const response = await fetch("http://localhost:5000/api/user/create-admin", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(adminDetails),
+            credentials: 'include'
+        });
+        const data = await response.json();
+        console.log(data);
+        if(data.error){
+            throw new Error(data.error || 'Failed to create');
+        }
+        return data;
+    }
+    catch(error){
+        throw new Error(error.message || 'Network error occurred');
+    }
+}
+
+export async function loginAdmin(adminDetails){
+    try{
+        const response = await fetch("http://localhost:5000/api/user/login-admin", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(adminDetails),
+            credentials: 'include'
+        });
+        const data = await response.json();
+        console.log(data)
+        if(data.error){
+            throw new Error(data.error || 'Failed to login');
+        }
+        return data;
+    }
+    catch(error){
+        console.log(error)
+        throw new Error(error.message || 'Network error occurred');
+    }
+}
+
+export async function logoutAdmin(){
+    try{
+        const response = await fetch("http://localhost:5000/api/user/logout-admin", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: 'include'
+        });
+        const data = await response.json();
+        if (data.error) {
+            throw new Error(data.error || 'Logout failed'); // Throw an error if the status isn't OK
+        }
+        return {status: true, message: data};
+    }
+    catch(error){
+        return {status: false, message: error.message, error};
+    }
+}

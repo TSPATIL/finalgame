@@ -5,6 +5,10 @@ import { MdFullscreen } from "react-icons/md";
 import { MdFullscreenExit } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 import { useStopwatch } from 'react-timer-hook';
+import Confetti from 'react-confetti';
+import LoginModal from './LoginModal';
+import { useSelector } from 'react-redux';
+import { selectIsLogin } from '../Redux/features/Authentication/AuthenticationSlice';
 
 function MyStopwatch() {
     const {
@@ -18,7 +22,6 @@ function MyStopwatch() {
         pause,
         reset,
     } = useStopwatch({ autoStart: true });
-
 
     return (
         <div>
@@ -34,6 +37,12 @@ function MyStopwatch() {
 }
 
 export default function GameEditor() {
+
+    // useEffect(() => {
+    //     const confetti = confettiRef.current;
+    //     const context = confetti.getContext('2d');
+    // }, []);
+
     var elem = document.getElementById('GameWditor');
 
     const appRef = useRef(null);
@@ -92,8 +101,21 @@ export default function GameEditor() {
         setMenu(!menu);
     }
 
+    const [isConfettiVisible, setIsConfettiVisible] = useState(false);
+    const handleSubmit = (e)=>{
+        // const confetti = confettiRef.current;
+        // const context = confetti.getContext('2d');
+        setIsConfettiVisible(true);
+        setTimeout(() => setIsConfettiVisible(false), 5000);
+    }
+
+    const [btn, setBtn] = useState(true);
+    
+    const isLogin = useSelector(selectIsLogin)
     return (
+        <div>
         <div ref={appRef} id='GameEditor' className='GameEditor bg-gray-900 overflow-hidden'>
+            {isConfettiVisible && <Confetti className='' numberOfPieces={500} />}
             <div className='menu h-[80px] w-full flex justify-between items-center px-6'>
                 <div className='flex justify-center items-center w-fit'>
                     <div className="bg-gradient-to-b from-yellow-400 to-yellow-700 bg-clip-text text-transparent w-fit drop-shadow-2xl font-medium text-gray-300 text-[27px] sm:text-[40px] tracking-[0] leading-[normal] whitespace-nowrap shadow-drop-shadow-100">
@@ -137,25 +159,29 @@ export default function GameEditor() {
             <div className='lg:flex w-full h-full lg:h-[90vh] justify-center items-center'>
                 <div className='w-full lg:w-1/2 h-full flex justify-center items-center flex-col'>
                     <div className='w-full h-[400px] lg:h-3/5 flex justify-center items-center px-2 p-1'>
-                        <iframe className='w-full h-full border-[1px] rounder-md border-white' src="https://www.youtube.com/embed/NthGfn_ddRQ?autoplay=1&controls=0&loop=1" title="YouTube video player" autoplay frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        <iframe className='w-full h-full border-[1px] rounder-md border-white' src="https://www.youtube.com/embed/NthGfn_ddRQ?autoplay=1&controls=0&loop=1" title="YouTube video player" autoPlay frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
                     </div>
                     <div className='w-full min-h-[200px] lg:h-2/5 flex justify-center items-center px-2 py-1'>
                         <div className='flex justify-between items-center flex-col w-full h-full border-[1px] border-white rounded-lg'>
                             <div className='options h-1/6 w-full flex justify-start items-center font-bold px-3 rounded-tr-lg rounded-tl-lg bg-gray-800 text-white border-b-[1px] border-white'>
-                                <div className='px-3 py-2 bg-blue-700 hover:bg-blue-800 cursor-pointer'>Challenge</div>
-                                <div className='px-3 py-2 bg-blue-700 hover:bg-blue-800 cursor-pointer'>Recommendation</div>
+                                <div onClick={() => { setBtn(true) }} className='px-3 py-2 bg-blue-700 hover:bg-blue-800 cursor-pointer'>Challenge</div>
+                                <div onClick={() => { setBtn(false) }} className='px-3 py-2 bg-blue-700 hover:bg-blue-800 cursor-pointer'>Recommendation</div>
                             </div>
                             <div className='h-5/6 w-full bg-gray-800 text-gray-300  rounded-bl-lg rounded-br-lg'>
-                                <div className='h-full w-full p-2 overflow-y-auto space-y-1 text-justify'>
-                                    <p className='text-xl font-bold'>Challenge No: <span className='text-base text-gray-400'>1</span></p>
-                                    <p className='text-xl font-bold'>Title: <span className='text-base text-gray-400'>Let's Begin</span></p>
-                                    <p className='text-xl font-bold'>Description: <span className='text-base text-gray-400'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum reprehenderit ad itaque consequuntur cupiditate laborum quae tenetur ducimus suscipit possimus ratione maxime voluptate minima autem repellendus vitae provident, sint soluta obcaecati? Laborum eveniet commodi distinctio quod ea voluptatem tenetur accusamus.</span></p>
-                                    <p className='text-xl font-bold'>Scenario: <span className='text-base text-gray-400'>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quibusdam, necessitatibus autem expedita recusandae dignissimos eum tenetur excepturi dolor minus maiores?</span></p>
-                                </div>
-                                <div className='h-full w-full p-2 overflow-y-auto space-y-1 text-justify'>
-                                    <p className="text-xl font bold">Concepts: <span className="text-base text-gray-400">SQL JOIN, SELECT</span></p>
-                                    <p className="text-base font bold">We recommend you to solve the problem with above concepts.</p>
-                                </div>
+                                {
+                                    btn ?
+                                        <div className='h-full w-full p-2 overflow-y-auto space-y-1 text-justify'>
+                                            <p className='text-xl font-bold'>Challenge No: <span className='text-base text-gray-400'>1</span></p>
+                                            <p className='text-xl font-bold'>Title: <span className='text-base text-gray-400'>Let's Begin</span></p>
+                                            <p className='text-xl font-bold'>Description: <span className='text-base text-gray-400'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum reprehenderit ad itaque consequuntur cupiditate laborum quae tenetur ducimus suscipit possimus ratione maxime voluptate minima autem repellendus vitae provident, sint soluta obcaecati? Laborum eveniet commodi distinctio quod ea voluptatem tenetur accusamus.</span></p>
+                                            <p className='text-xl font-bold'>Scenario: <span className='text-base text-gray-400'>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quibusdam, necessitatibus autem expedita recusandae dignissimos eum tenetur excepturi dolor minus maiores?</span></p>
+                                        </div>
+                                        :
+                                        <div className='h-full w-full p-2 overflow-y-auto space-y-1 text-justify'>
+                                            <p className="text-xl font bold">Concepts: <span className="text-base text-gray-400">SQL JOIN, SELECT</span></p>
+                                            <p className="text-base font bold">We recommend you to solve the problem with above concepts.</p>
+                                        </div>
+                                }
                             </div>
                         </div>
                     </div>
@@ -163,7 +189,29 @@ export default function GameEditor() {
                 <div className='w-full lg:w-1/2 h-full flex justify-center items-center flex-col'>
                     <div className='w-full h-[400px] lg:h-3/5 flex justify-center items-center px-2 py-1'>
                         <div className='w-full h-full bg-gray-800 overflow-auto border-[1px] rounded-lg border-white p-2'>
-                            <p className='text-lg text-white'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis sed iusto nesciunt ab architecto omnis accusamus earum asperiores deleniti accusantium veniam nulla repudiandae consectetur modi rem aut voluptatibus, minus dignissimos tenetur! Possimus repudiandae voluptates ex minima quisquam cupiditate aliquid ab ipsum quam dolor eum ducimus aliquam a iusto, at reiciendis quos illum repellat voluptatem necessitatibus incidunt veritatis numquam. Harum aliquid assumenda voluptate, maiores exercitationem quaerat temporibus dolorem libero ipsa molestias quos dignissimos magni est amet, quae quod? Saepe, ex libero.</p>
+                            <div className='text-lg text-white'>
+                                <p>Select * from Country;</p>
+                                <table className='mb-3 border-2 border-white'>
+                                    <tbody>
+                                        <tr className='border-2 border-white'>
+                                            <th  className='border-r-2 border-white'>Company</th>
+                                            <th  className='border-r-2 border-white'>Contact</th>
+                                            <th>Country</th>
+                                        </tr>
+                                        <tr className='border-2 border-white'>
+                                            <td className='border-r-2 border-white'>Alfreds Futterkiste</td>
+                                            <td className='border-r-2 border-white'>Maria Anders</td>
+                                            <td>Germany</td>
+                                        </tr>
+                                        <tr  className='border-2 border-white'>
+                                            <td className='border-r-2 border-white'>Centro comercial Moctezuma</td>
+                                            <td className='border-r-2 border-white'>Francisco Chang</td>
+                                            <td>Mexico</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis sed iusto nesciunt ab architecto omnis accusamus earum asperiores deleniti accusantium veniam nulla repudiandae consectetur modi rem aut voluptatibus, minus dignissimos tenetur! Possimus repudiandae voluptates ex minima quisquam cupiditate aliquid ab ipsum quam dolor eum ducimus aliquam a iusto, at reiciendis quos illum repellat voluptatem necessitatibus incidunt veritatis numquam. Harum aliquid assumenda voluptate, maiores exercitationem quaerat temporibus dolorem libero ipsa molestias quos dignissimos magni est amet, quae quod? Saepe, ex libero.
+                            </div>
                         </div>
                     </div>
                     <div className='w-full h-[100px] lg:h-1/5 lg:hidden flex justify-center items-center gap-2 px-2 py-1'>
@@ -177,7 +225,7 @@ export default function GameEditor() {
                         </div>
                     </div>
                     <div className='w-full h-2/5 flex justify-center items-center px-2 py-1'>
-                        <EditorInput startTime={startTime} pauseTime={pauseTime} resetTime={resetTime} setAttempts={setAttempts} attempts={attempts} handleAttemptsZero={handleAttemptsZero} />
+                        <EditorInput handleSubmit={handleSubmit} startTime={startTime} pauseTime={pauseTime} resetTime={resetTime} setAttempts={setAttempts} attempts={attempts} handleAttemptsZero={handleAttemptsZero} />
                     </div>
                 </div>
             </div>
@@ -199,6 +247,8 @@ export default function GameEditor() {
                     </div>
                 </div>
             </div>
+        </div>
+        {!isLogin && <LoginModal/>}
         </div>
     )
 }

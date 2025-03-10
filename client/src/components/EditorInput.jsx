@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Editor from "@monaco-editor/react";
 
-export default function EditorInput({startTime, pauseTime, resetTime, setAttempts, attempts, handleAttemptsZero}) {
+export default function EditorInput({startTime, pauseTime, resetTime, setAttempts, attempts, handleAttemptsZero, handleSubmit}) {
   const [code, setCode] = useState('');
   const handleOnChange = (value, e)=>{
     setCode(value);
@@ -23,6 +23,7 @@ export default function EditorInput({startTime, pauseTime, resetTime, setAttempt
       </div>
       <div className="w-full h-1/5 flex justify-end items-center mt-1">
         <button onClick={()=>{
+          handleSubmit();
           if(attempts > 1)
             setAttempts(attempts-1)
           else

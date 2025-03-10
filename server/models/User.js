@@ -24,12 +24,11 @@ const userSchema = new Schema({
     },
     profile: {
         firstName: { type: String, minLength: 3, trim: true },
-        middleName: { type: String, minLength: 3, trim: true },
+        middleName: { type: String, trim: true },
         lastName: { type: String, minLength: 3, trim: true },
         gender: { type: String, enum: ['male', 'female', 'other'] },
         contact: {
-            email: [{ type: String, trim: true, match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ }],
-            phone: [{ type: String, trim: true, minLength: 10, maxLength: 10 }],
+            phone: { type: String, trim: true, minLength: 10, maxLength: 10 },
             portfolio: [{ type: String, trim: true }],
             links: [{
                 name: { type: String, trim: true },
@@ -37,7 +36,7 @@ const userSchema = new Schema({
             }]
         },
         dateOfBirth: { type: Date },
-        image: { type: String },
+        image: { type: Buffer },
         bio: { type: String, trim: true },
         avatar: { type: String, default: '' },
         address: {
@@ -71,6 +70,10 @@ const userSchema = new Schema({
         //     skills: [{ type: String }],
         //     description: { type: String }
         // }]
+    },
+    refreshToken: {
+        type: String,
+        required: true
     }
 },
 {

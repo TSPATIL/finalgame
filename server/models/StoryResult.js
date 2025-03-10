@@ -14,12 +14,19 @@ const resultSchema = new Schema({
     },
     currentChallenge: {
         type: Number,
-        default: 0.  
+        default: 0
     },
     challengesProgress: [{
-        challengeId: {
-            ref: 'challenge',
-            type: mongoose.Schema.Types.ObjectId,
+        difficulty: {
+            type: String,
+            required: true
+        },
+        question: {
+            type: String,
+            required: true
+        },
+        answer: {
+            type: String,
             required: true
         },
         isCompleted: {
@@ -27,10 +34,13 @@ const resultSchema = new Schema({
             default: false,
             required: true
         },
-        answerGiven: { type: String },
         pointsEarned: { type: Number },
         timeTaken: { type: Number },
-        attempts: { type: Number }
+        attempts: { type: Number },
+        keyWords: [{
+            type: String,
+            trim: true
+        }]
     }],
     status: {
         type: String,
@@ -46,7 +56,7 @@ const resultSchema = new Schema({
         type: Number,
         default: 0
     }
-}, 
+},
 { 
     timestamps: true 
 });
