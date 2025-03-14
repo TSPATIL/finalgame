@@ -55,12 +55,11 @@ export default function ViewQuiz() {
     ));
   }
 
-  const deleteTest = async (e, id, type)=>{
-    console.log({id, type})
+  const deleteTest = async (id, type, testNo)=>{
     const c = confirm("Are you sure to delete this record?");
     if(c){
         try {
-          const response = await fetch(`http://localhost:5000/api/test/delete-test-story/${id}/${type}`, {
+          const response = await fetch(`http://localhost:5000/api/test/delete-test/${id}/${type}`, {
             method: 'DELETE',
             headers: {
               "Content-Type": "application/json"
@@ -68,8 +67,11 @@ export default function ViewQuiz() {
             credentials: 'include'
           });
           const result = await response.json();
-          console.log(result.data);
-          setTests(result.data);
+          console.log(result);
+          const newTest = tests.filter((test, testId)=>{
+            return testId !== testNo;
+          })
+          setTests(newTest);
           dispatch(showAlert({ message: "Test Deleted Successfully", type: "success" }))
         } catch (error) {
           console.log(error)
@@ -124,8 +126,8 @@ export default function ViewQuiz() {
                           <hr className='w-full bg-white hidden group-hover:block' />
                           <div className='hidden group-hover:flex justify-center items-center gap-5'>
                             <Link to={`/admin/view-quiz-details/${test._id}/${test.type}`} className='px-5 py-2 bg-gradient-to-b from-blue-700 to-blue-900 rounded-md hover:bg-gradient-to-t text-white font-bold flex justify-center items-center gap-2'><FaEye className='text-xl' /><p className='hidden sm:block'>View</p></Link>
-                            <Link to={`/admin/update-quiz/${test._id}`} className='px-5 py-2 bg-gradient-to-b from-blue-700 to-blue-900 rounded-md hover:bg-gradient-to-t text-white font-bold flex justify-center items-center gap-2'><FaEdit className='text-xl' /><p className='hidden sm:block'>Update</p></Link>
-                            <button onClick={(e)=>deleteTest(e, test._id, test.type)} className='px-5 py-2 bg-gradient-to-b from-blue-700 to-blue-900 rounded-md hover:bg-gradient-to-t text-white font-bold flex justify-center items-center gap-2'><MdDelete className='text-xl' /><p className='hidden sm:block'>Delete</p></button>
+                            <Link to={`/admin/update-quiz/${test._id}/${test.type}`} className='px-5 py-2 bg-gradient-to-b from-blue-700 to-blue-900 rounded-md hover:bg-gradient-to-t text-white font-bold flex justify-center items-center gap-2'><FaEdit className='text-xl' /><p className='hidden sm:block'>Update</p></Link>
+                            <button onClick={()=>deleteTest(test._id, test.type, testNo)} className='px-5 py-2 bg-gradient-to-b from-blue-700 to-blue-900 rounded-md hover:bg-gradient-to-t text-white font-bold flex justify-center items-center gap-2'><MdDelete className='text-xl' /><p className='hidden sm:block'>Delete</p></button>
                           </div>
                         </div>
                       )})

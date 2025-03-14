@@ -38,16 +38,17 @@ export default function ViewQuizDetails() {
         return base64Regex.test(str);
     }
 
-    const checkImageBufferOrBase64 = (image)=>{
-        if(image === undefined) return null;
-        else if(image.type = "Buffer"){
+    const checkImageBufferOrBase64 = (image) => {
+        if (!image) return null;
+    
+        if (image.type === "Buffer") {
             const buffer = Buffer.from(image.data);
-            console.log(`data:image/png;base64,${buffer.toString('base64')}`);
-            return `data:image/png;base64,${buffer.toString('base64')}`
+            return `data:image/png;base64,${buffer.toString('base64')}`;
         }
-        else if (typeof imageData === 'string') {
-            return `data:image/png;base64,${imageData}`
-        } 
+        else if (typeof image === 'string' && isBase64(image)) {
+            return `data:image/png;base64,${image}`;
+        }
+    
         return null;
     }
 
@@ -83,14 +84,14 @@ export default function ViewQuizDetails() {
                                     keywords: question.keywords || '',
                                     examples: question.examples?.map((example) => {
                                         return {
-                                            egQuestion: example.question,
-                                            egAnswer: example.answer,
-                                            egExplanation: example.explanation
+                                            egQuestion: example?.question || '',
+                                            egAnswer: example?.answer || '',
+                                            egExplanation: example?.explanation || ''
                                         }
-                                    })
+                                    }) || [{ egQuestion: '', egAnswer: '', egExplanation: '' }]
                                 }
                             }),
-                            teaching: { teachingTopic: challenge.teachings.topic, teachingExplanation: challenge.teachings.explanation }
+                            teaching: { teachingTopic: challenge.teachings?.topic || '', teachingExplanation: challenge.teachings?.explanation || ''}
                         }
                     }));
                     dispatch(showAlert({ message: "Test Fetched Successfully", type: "success" }))

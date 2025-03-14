@@ -21,13 +21,14 @@ export async function addTest(testDetails) {
     }
 }
 
-export async function updateTestDetails(testID, testDetails) {
+export async function updateTestDetails(testID, testType, testDetails) {
     try {
+        console.log("hello")
         for (let [key, value] of testDetails.entries()) {
             console.log(key, value);
         }
-        const response = await fetch(`http://localhost:5000/api/test/update-test-story/${testID}`, {
-            method: 'PATCH',
+        const response = await fetch(`http://localhost:5000/api/test/update-test/${testID}/${testType}`, {
+            method: 'PUT',
             headers: {
                 // "Content-Type": "multipart/form-data",
             },
@@ -35,8 +36,9 @@ export async function updateTestDetails(testID, testDetails) {
             credentials: 'include'
         });
         const data = await response.json();
+        console.log(data)
         if(!data.status){
-            throw new Error(data.error || 'Fetching details failed');
+            throw new Error(data.error || 'Update failed');
         }
         return data;
     } catch (error) {

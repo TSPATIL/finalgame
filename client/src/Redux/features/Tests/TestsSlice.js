@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import { addTest, deleteTest, getTestDetails, updateTestDetails } from "./TestsAPIFunc";
+import { addTest, deleteTest, getAllTests, getTestDetails, updateTestDetails } from "./TestsAPIFunc";
 
 const initialState = {
     loading: false,
@@ -25,7 +25,7 @@ export const getAllTestsAsync = createAsyncThunk(
     "tests/getAllTests",
     async (_, { rejectWithValue }) => {
         try {
-            const response = await getAllContacts();
+            const response = await getAllTests();
             return response;
         }
         catch (error) {
@@ -38,7 +38,7 @@ export const getTestDetailsAsync = createAsyncThunk(
     "tests/getTestDetails",
     async (testID, { rejectWithValue }) => {
         try {
-            const response = await getAllContacts(testID);
+            const response = await getTestDetails(testID);
             return response;
         }
         catch (error) {
@@ -62,12 +62,15 @@ export const deleteTestAsync = createAsyncThunk(
 
 export const updateTestDetailsAsync = createAsyncThunk(
     "tests/updateTestDetails",
-    async (testID, testDetails, { rejectWithValue }) => {
+    async ({testID, testType, testDetails}, { rejectWithValue }) => {
         try {
-            const response = await updateTestDetails(testID, testDetails)
+            console.log(testID);
+            console.log(testType);
+            console.log(testDetails);
+            const response = await updateTestDetails(testID, testType, testDetails)
             return response;
         }
-        catch {
+        catch(error) {
             return rejectWithValue(error);
         }
     }
@@ -84,15 +87,15 @@ export const testsSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(addTestsAsync.pending, (state) => {
+            .addCase(addTestAsync.pending, (state) => {
                 state.loading = true
             })
-            .addCase(addTestsAsync.fulfilled, (state, action) => {
+            .addCase(addTestAsync.fulfilled, (state, action) => {
                 state.loading = false
                 state.test = action.payload.test
                 state.challenges = action.payload.challenges
             })
-            .addCase(addTestsAsync.rejected, (state, action) => {
+            .addCase(addTestAsync.rejected, (state, action) => {
                 state.loading = false
                 state.error = action.error
             })
@@ -108,27 +111,27 @@ export const testsSlice = createSlice({
                 state.loading = false
                 state.error = action.error
             })
-            .addCase(deleteTestsAsync.pending, (state) => {
+            .addCase(updateTestDetailsAsync.pending, (state) => {
                 state.loading = true
             })
-            .addCase(deleteTestsAsync.fulfilled, (state, action) => {
+            .addCase(updateTestDetailsAsync.fulfilled, (state, action) => {
                 state.loading = false
                 state.test = action.payload.test
                 state.challenges = action.payload.challenges
             })
-            .addCase(deleteTestsAsync.rejected, (state, action) => {
+            .addCase(updateTestDetailsAsync.rejected, (state, action) => {
                 state.loading = false
                 state.error = action.error
             })
-            .addCase(updateTestsDetailsAsync.pending, (state) => {
+            .addCase(deleteTestAsync.pending, (state) => {
                 state.loading = true
             })
-            .addCase(updateTestsDetailsAsync.fulfilled, (state, action) => {
+            .addCase(deleteTestAsync.fulfilled, (state, action) => {
                 state.loading = false
                 state.test = action.payload.test
                 state.challenges = action.payload.challenges
             })
-            .addCase(updateTestsDetailsAsync.rejected, (state, action) => {
+            .addCase(deleteTestAsync.rejected, (state, action) => {
                 state.loading = false
                 state.error = action.error
             })

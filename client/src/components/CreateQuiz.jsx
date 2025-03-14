@@ -8,7 +8,7 @@ import { showAlert } from '../Redux/features/Alerts/AlertSlice';
 
 
 export default function CreateQuiz() {
-    const [test, setTest] = useState({ title: '', description: '', topic: 'sql', challenge: [], access: 'private', dueDate: '', type: 'story_learning' });
+    const [test, setTest] = useState({ title: '', description: '', topic: 'sql', challenge: [], access: 'private', dueDate: '', type: 'Story-Based-Test' });
     const [challenges, setChallenges] = useState([{ title: '', codeExecute: '', preStory: '', preImage: null, postStory: '', postImage: null, questions: [{ question: '', answer: '', difficulty: 'easy', constraints: '', keywords: '', examples: [{ egQuestion: '', egAnswer: '', egExplanation: '' }] }], teaching: { teachingTopic: '', teachingExplanation: '' } }])
     
     const dispatch = useDispatch();
@@ -36,53 +36,57 @@ export default function CreateQuiz() {
     }
 
     const handleStorySubmit = async (e) => {
-        e.preventDefault();
-        const c = confirm('Are you sure to submit the test details? Check the details before submitting.')
-        if (c) {
-            const formData = new FormData();
-            formData.append('title', test.title);
-            formData.append('description', test.description);
-            formData.append('topic', test.topic);
-            formData.append('type', test.type);
-            formData.append('visibility', test.access);
-            formData.append('testDueDate', test.dueDate);
-            challenges.forEach((challenge, cNo) => {
-                formData.append(`challenges[${cNo}][title]`, challenge.title);
-                formData.append(`challenges[${cNo}][codeExecution]`, challenge.codeExecute);
-                formData.append(`challenges[${cNo}][previousStory][image]`, challenge.preImage);
-                formData.append(`challenges[${cNo}][previousStory][story]`, challenge.preStory);
-                formData.append(`challenges[${cNo}][postStory][image]`, challenge.postImage);
-                formData.append(`challenges[${cNo}][postImage][story]`, challenge.postStory);
-                formData.append(`challenges[${cNo}][teachings][topic]`, challenge.teaching.teachingTopic);
-                formData.append(`challenges[${cNo}][teachings][explanation]`, challenge.teaching.teachingExplanation);
-                challenge.questions.forEach((question, qNo) => {
-                    formData.append(`challenges[${cNo}][questions][${qNo}][difficulty]`, question.difficulty);
-                    formData.append(`challenges[${cNo}][questions][${qNo}][question]`, question.question);
-                    formData.append(`challenges[${cNo}][questions][${qNo}][answer]`, question.answer);
-                    question.examples.forEach((example, eNo) => {
-                        formData.append(`challenges[${cNo}][questions][${qNo}][examples][${eNo}][question]`, example.egQuestion);
-                        formData.append(`challenges[${cNo}][questions][${qNo}][examples][${eNo}][answer]`, example.egAnswer);
-                        formData.append(`challenges[${cNo}][questions][${qNo}][examples][${eNo}][explanation]`, example.egExplanation);
+        try {
+            e.preventDefault();
+            const c = confirm('Are you sure to submit the test details? Check the details before submitting.')
+            if (c) {
+                const formData = new FormData();
+                formData.append('title', test.title);
+                formData.append('description', test.description);
+                formData.append('topic', test.topic);
+                formData.append('type', test.type);
+                formData.append('visibility', test.access);
+                formData.append('testDueDate', test.dueDate);
+                challenges.forEach((challenge, cNo) => {
+                    formData.append(`challenges[${cNo}][title]`, challenge.title);
+                    formData.append(`challenges[${cNo}][codeExecution]`, challenge.codeExecute);
+                    formData.append(`challenges[${cNo}][previousStory][image]`, challenge.preImage);
+                    formData.append(`challenges[${cNo}][previousStory][story]`, challenge.preStory);
+                    formData.append(`challenges[${cNo}][postStory][image]`, challenge.postImage);
+                    formData.append(`challenges[${cNo}][postStory][story]`, challenge.postStory);
+                    formData.append(`challenges[${cNo}][teachings][topic]`, challenge.teaching.teachingTopic);
+                    formData.append(`challenges[${cNo}][teachings][explanation]`, challenge.teaching.teachingExplanation);
+                    challenge.questions.forEach((question, qNo) => {
+                        formData.append(`challenges[${cNo}][questions][${qNo}][difficulty]`, question.difficulty);
+                        formData.append(`challenges[${cNo}][questions][${qNo}][question]`, question.question);
+                        formData.append(`challenges[${cNo}][questions][${qNo}][answer]`, question.answer);
+                        question.examples.forEach((example, eNo) => {
+                            formData.append(`challenges[${cNo}][questions][${qNo}][examples][${eNo}][question]`, example.egQuestion);
+                            formData.append(`challenges[${cNo}][questions][${qNo}][examples][${eNo}][answer]`, example.egAnswer);
+                            formData.append(`challenges[${cNo}][questions][${qNo}][examples][${eNo}][explanation]`, example.egExplanation);
+                        });
+                        // question.constraints.split(',').forEach((constraint, conNo) => {
+                            formData.append(`challenges[${cNo}][questions][${qNo}][constraints]`, question.constraints.trim());
+                        // });
+                        // question.keywords.split(',').forEach((keyword, keyNo) => {
+                            formData.append(`challenges[${cNo}][questions][${qNo}][keywords]`, question.keywords.trim());
+                        // });
                     });
-                    question.constraints.split(',').forEach((constraint, conNo) => {
-                        formData.append(`challenges[${cNo}][question][${qNo}][constraints][${conNo}]`, constraint.trim());
-                    });
-                    question.keywords.split(',').forEach((keyword, keyNo) => {
-                        formData.append(`challenges[${cNo}][question][${qNo}][keywords][${keyNo}]`, keyword.trim());
-                    });
-                });
-            })
-            for (let [key, value] of formData.entries()) {
-                console.log(key, value);
+                })
+                for (let [key, value] of formData.entries()) {
+                    console.log(key, value);
+                }
+                const response = await dispatch(addTestAsync(formData));
+                const result = response.payload;
+                if (result.status) {
+                    dispatch(showAlert({ message: "Test created successfully", type: "success" }));
+                    navigate('/admin/admin-dashboard');
+                } else {
+                    dispatch(showAlert({ message: "Test creation failed", type: "error" }));
+                }
             }
-            const response = await dispatch(addTestAsync(formData));
-            const result = response.payload;
-            if (result.status) {
-                dispatch(showAlert({ message: "Test created successfully", type: "success" }));
-                navigate('/admin/admin-dashboard');
-            } else {
-                dispatch(showAlert({ message: "Error occured", type: "error" }));
-            }
+        } catch (error) {
+            dispatch(showAlert({ message: "Error occured", type: "error" }));
         }
     }
 
@@ -117,7 +121,7 @@ export default function CreateQuiz() {
                             <div className='w-full h-full flex flex-col'>
                                 <label htmlFor="type" className='font-semibold leading-none text-gray-300'>Test Type</label>
                                 <select id='type' name='type' required value={test.type} onChange={handleTestInfoChange} className='leading-none text-gray-50 p-3 mt-3 outline-none bg-gray-800 rounded border-[gold] border-2 border-solid'>
-                                    <option value="story_learning">Story based learning</option>
+                                    <option value="Story-Based-Test">Story based learning</option>
                                     <option value="multiple_choice">Multiple Choices</option>
                                 </select>
                             </div>

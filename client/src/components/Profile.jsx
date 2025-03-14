@@ -12,6 +12,7 @@ export default function Profile() {
     const [details, setDetails] = useState({ fname: '', mname: '', lname: '', email: '', phone: '', portfolio: '', date: '', gender: 'Male', image: null, bio: '', street: '', city: '', country: '', state: '', pincode: '', skills: [], links: [{ name: '', address: '' }], education: [{ degree: '', institute: '', startDate: '', endDate: '', status: 'pursuing' }] });
     const handleOnChange = (e) => {
         setDetails({ ...details, [e.target.name]: e.target.value });
+        console.log(e.target.value);
     }
 
     const handleOnSkillChange = (e) => {
@@ -584,7 +585,7 @@ export default function Profile() {
                 if (skill !== '') formData.append(`profile[skills][${index}]`, skill);
             })
             details.education.forEach((education, index) => {
-                if (education.degree !== undefined && education.institute !== undefined && education.startDate !== undefined && education.endDate !== undefined) {
+                if (education.degree !== undefined && education.institute !== undefined && education.startDate !== undefined && education.startDate !== null && education.endDate !== undefined && education.endDate !== null) {
                     formData.append(`profile[education][${index}][degree]`, education.degree);
                     formData.append(`profile[education][${index}][institute]`, education.institute);
                     formData.append(`profile[education][${index}][startDate]`, education.startDate);

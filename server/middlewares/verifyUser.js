@@ -37,33 +37,27 @@ const verifyUser = async (req, res, next) => {
             decodedToken = await admin.auth().verifyIdToken(authToken);
         }
         catch(error){
-            console.log(error)
             if(error.code === "auth/id-token-expired"){ //error.code === "auth/id-token-revoked" || 
-                console.log("hello")
                 if(!refreshToken){
                     return res.status(401).json({ status: false, error: 'Unauthorized: No auth token found' });
                 }
                 try{
-                    console.log("hello1");
                     console.log(refreshToken)
                     const user = await userModel.findOne({ refreshToken });
                     console.log(user)
                     
-                    console.log("hello")
                     if(!user){
                         return res.status(401).json({status: false, error: 'Unauthorized. Invalid token'});
                     }
 
                     const newToken = await generateTokens(refreshToken);
-                    console.log(newToken)
                     if (!newToken.status) {
                         return res.status(403).json({ status: false, error: newToken.error || 'Session expired. Please log in again.' });
                     }
                     
                     const idToken = newToken.data.id_token;
                     const newRefreshToken = newToken.data.refresh_token;
-                    
-                    console.log(idToken)
+
                     decodedToken = await admin.auth().verifyIdToken(idToken);
 
                     if(user.firebaseId !== decodedToken.uid){
@@ -76,8 +70,6 @@ const verifyUser = async (req, res, next) => {
                         maxAge: 24 * 60 * 60 * 1000,
                         sameSite: 'None',
                     });
-                    
-                    console.log("hello")
                     res.cookie('refreshToken', newRefreshToken, {
                         httpOnly: true,
                         secure: true,
@@ -87,8 +79,6 @@ const verifyUser = async (req, res, next) => {
 
                     user.refreshToken = newRefreshToken;
                     await user.save();
-                    
-                    console.log("hello")
                 }
                 catch(error){
                     console.log(error)

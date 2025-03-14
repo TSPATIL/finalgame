@@ -41,7 +41,7 @@ const deleteContact = async (req, res) => {
         
         const contact = await contactModel.findById(req.param.contactId);
         if (!contact) {
-            return res.status(400).json({ status: false, error: "Contact not fiund", message: "Contact not found" })
+            return res.status(400).json({ status: false, error: "Contact not found", message: "Contact not found" })
         }
         
         const deleteContact = await contactModel.findByIdAndDelete(req.param.userId);

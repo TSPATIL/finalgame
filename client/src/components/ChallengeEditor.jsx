@@ -57,7 +57,9 @@ export default function CreateChallenge({ challenges, setChallenges, type = 'Cre
 
     const handleAddQuestion = (cIndex) => {
         let newChallenges = [...challenges];
-        newChallenges[cIndex].questions.push({ question: '', answer: '', difficulty: 'easy', constraints: '', keywords: '', examples: [{ egQuestion: '', egAnswer: '', egExplanation: '' }] });
+        if(newChallenges[cIndex].questions.length === 0) newChallenges[cIndex].questions.push({ question: '', answer: '', difficulty: 'easy', constraints: '', keywords: '', examples: [{ egQuestion: '', egAnswer: '', egExplanation: '' }] });
+        else if(newChallenges[cIndex].questions.length === 1) newChallenges[cIndex].questions.push({ question: '', answer: '', difficulty: 'medium', constraints: '', keywords: '', examples: [{ egQuestion: '', egAnswer: '', egExplanation: '' }] });
+        else newChallenges[cIndex].questions.push({ question: '', answer: '', difficulty: 'hard', constraints: '', keywords: '', examples: [{ egQuestion: '', egAnswer: '', egExplanation: '' }] });
         setChallenges(newChallenges);
     }
 
@@ -88,7 +90,6 @@ export default function CreateChallenge({ challenges, setChallenges, type = 'Cre
     }
 
     const checkImage = (image) => {
-        console.log(image)
         if (image) {
             if (isBase64(image)) {
                 return image;
@@ -138,7 +139,7 @@ export default function CreateChallenge({ challenges, setChallenges, type = 'Cre
                                                 <input type="file" id="preImage" name="preImage" accept='image/*' onChange={(e) => handleInputOnChange(i, e.target.name, e.target.files[0])} className='leading-none outline-none text-gray-50 p-3 border-[gold] border-2 border-solid mt-3 bg-gray-800 rounded-md' />
                                                 :
                                                 <div className='leading-none outline-none text-gray-50 border-[gold] border-2 border-solid mt-3 bg-gray-800 rounded-md flex justify-center items-center'>
-                                                    <a href={checkImage(challenge.preImage)} target='_blank' rel='noopener noreferrer' className='w-[60%] md:w-[80%] text-white py-3 text-lg no-underline px-5 flex items-center justify-start gap-5'><GrView /> {challenge.preImage.name}</a>
+                                                    <a href={checkImage(challenge.preImage)} target='_blank' rel='noopener noreferrer' className='w-[60%] md:w-[80%] text-white py-3 text-lg no-underline px-5 flex items-center justify-start gap-5'><GrView /> {challenge.preImage.name || 'Previous-Story.png'}</a>
                                                     <hr className='rotate-90 bg-white w-[30px]' />
                                                     <button className='text-lg text-orange-500 w-[40%] md:w-[20%] h-full py-2 px-5 outline-none' onClick={()=>handleOnImageDelete(i, 'preImage', null)}>Cancel</button>
                                                 </div>
@@ -160,7 +161,7 @@ export default function CreateChallenge({ challenges, setChallenges, type = 'Cre
                                                 <input type="file" id="postImage" name="postImage" accept='image/*' onChange={(e) => handleInputOnChange(i, e.target.name, e.target.files[0])} className='leading-none outline-none text-gray-50 p-3 border-[gold] border-2 border-solid mt-3 bg-gray-800 rounded-md' />
                                                 :
                                                 <div className='leading-none outline-none text-gray-50 border-[gold] border-2 border-solid mt-3 bg-gray-800 rounded-md flex justify-center items-center'>
-                                                    <a href={checkImage(challenge.postImage)} target='_blank' rel='noopener noreferrer' className='w-[60%] md:w-[80%] text-white py-3 text-lg no-underline px-5 flex items-center justify-start gap-5'><GrView /> {challenge.postImage.name}</a>
+                                                    <a href={checkImage(challenge.postImage)} target='_blank' rel='noopener noreferrer' className='w-[60%] md:w-[80%] text-white py-3 text-lg no-underline px-5 flex items-center justify-start gap-5'><GrView /> {challenge.postImage.name || 'Post-Story.png'}</a>
                                                     <hr className='rotate-90 bg-white w-[30px]' />
                                                     <button className='text-lg text-orange-500 w-[40%] md:w-[20%] h-full py-2 px-5 outline-none' onClick={()=>handleOnImageDelete(i, 'postImage', null)}>Cancel</button>
                                                 </div>
@@ -199,9 +200,9 @@ export default function CreateChallenge({ challenges, setChallenges, type = 'Cre
                                                             <div className="w-full h-full flex flex-col">
                                                                 <label htmlFor="difficulty" className='font-semibold leading-none text-gray-300'>Difficulty</label>
                                                                 <select id='difficulty' name='difficulty' value={question.difficulty} onChange={(e) => handleQuestionInputOnChange(i, qNo, e.target.name, e.target.value)} className='h-16 leading-none text-gray-50 p-3 mt-3 outline-none bg-gray-800 rounded border-[gold] border-2 border-solid'>
-                                                                    <option value="easy">Easy</option>
-                                                                    <option value="medium">Medium</option>
-                                                                    <option value="hard">Hard</option>
+                                                                    {qNo === 0 ? <option value="easy">Easy</option> : null}
+                                                                    {qNo === 1 ? <option value="medium">Medium</option>: null}
+                                                                    {qNo === 2 ? <option value="hard">Hard</option> : null}
                                                                 </select>
                                                             </div>
                                                             <div className="w-full h-full flex flex-col">
@@ -260,7 +261,7 @@ export default function CreateChallenge({ challenges, setChallenges, type = 'Cre
                                                                 </div>
                                                             </div>
                                                             <div className='space-x-5 w-full h-full flex justify-center items-center md:justify-end md:items-center'>
-                                                                <button className='text-white text-xl font-bold px-10 py-3 md:px-8 md:py-2 border-2 border-[gold] border-solid bg-gradient-to-r from-green-700 to-green-900 hover:gradient-to-l w-full lg:w-fit h-fit transition duration-700 hover:scale-[0.98] lg:hover:scale-105 hover:shadow-xl rounded' onClick={(e) => handleAddQuestion(i)}>Create</button>
+                                                                <button disabled={challenge.questions.length === 3} className='text-white text-xl font-bold px-10 py-3 md:px-8 md:py-2 border-2 border-[gold] border-solid bg-gradient-to-r from-green-700 to-green-900 hover:gradient-to-l w-full lg:w-fit h-fit transition duration-700 hover:scale-[0.98] lg:hover:scale-105 hover:shadow-xl rounded' onClick={(e) => handleAddQuestion(i)}>Create</button>
                                                                 <button disabled={challenge.questions.length === 1 ? true : false} className='text-white text-xl w-full lg:w-fit h-fit font-bold px-10 py-3 md:px-8 md:py-2 border-2 border-[gold] border-solid rounded bg-gradient-to-r from-red-700 to-red-900 hover:bg-gradient-to-l transition duration-700 hover:scale-[0.98] lg:hover:scale-105 hover:shadow-xl' onClick={(e) => handleRemoveQuestion(i, qNo)}>Remove</button>
                                                             </div>
                                                         </div>
