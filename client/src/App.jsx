@@ -24,7 +24,8 @@ const AdminDashboard = lazy(()=>import("./components/AdminDashboard"));
 const Landingpage = lazy(()=>import("./components/Landingpage"));
 const Pagenotfound = lazy(()=>import("./components/Pagenotfound"));
 const UpdateQuiz = lazy(()=>import("./components/UpdateQuiz"));
-const ViewQuiz = lazy(()=>import("./components/ViewQuiz"));
+const ViewQuizAdmin = lazy(()=>import("./components/ViewQuizAdmin"));
+const ViewQuizUser = lazy(()=>import("./components/ViewQuizUser"));
 const ViewQuizDetails = lazy(()=>import("./components/ViewQuizDetails"));
 import Alert from "./components/Alert";
 // import Signup from "./components/Signup";
@@ -61,14 +62,15 @@ function App() {
           <Route exact path="/notice" element={<Suspense fallback={<div>Component is loading please wait...</div>}><LetterNotice/></Suspense>}></Route>
           <Route exact path="/contact" element={<Suspense fallback={<div>Component is loading please wait...</div>}><Contact/></Suspense>}></Route>
           <Route exact path="/user/profile" element={<Suspense fallback={<div>Component is loading please wait...</div>}><Profile/></Suspense>}></Route>
-          <Route exact path="/user/editor" element={<Suspense fallback={<div>Component is loading please wait...</div>}><GameEditor/></Suspense>}></Route>
+          <Route exact path="/user/editor/:id" element={<Suspense fallback={<div>Component is loading please wait...</div>}><GameEditor/></Suspense>}></Route>
+          <Route exact path="/user/view-quiz" element={<Suspense fallback={<div>Component is loading please wait...</div>}><ViewQuizUser/></Suspense>}></Route>
           <Route exact path="/admin/admin-dashboard" element={<Suspense fallback={<div>Component is loading please wait...</div>}><AdminDashboard/></Suspense>}></Route>
           <Route exact path="/admin/admin-login" element={<Suspense fallback={<div>Component is loading please wait...</div>}><AdminLogin/></Suspense>}></Route>
           <Route exact path="/admin/admin-signup" element={<Suspense fallback={<div>Component is loading please wait...</div>}><AdminSignup/></Suspense>}></Route>
           <Route exact path="/admin/change-password" element={<Suspense fallback={<div>Component is loading please wait...</div>}><AdminChangePassword/></Suspense>}></Route>
           <Route exact path="/admin/create-quiz" element={<Suspense fallback={<div>Component is loading please wait...</div>}><CreateQuiz/></Suspense>}></Route>
           <Route exact path="/admin/update-quiz/:id/:type" element={<Suspense fallback={<div>Component is loading please wait...</div>}><UpdateQuiz/></Suspense>}></Route>
-          <Route exact path="/admin/view-quiz/" element={<Suspense fallback={<div>Component is loading please wait...</div>}><ViewQuiz/></Suspense>}></Route>
+          <Route exact path="/admin/view-quiz/" element={<Suspense fallback={<div>Component is loading please wait...</div>}><ViewQuizAdmin/></Suspense>}></Route>
           <Route exact path="/admin/view-quiz-details/:id/:type" element={<Suspense fallback={<div>Component is loading please wait...</div>}><ViewQuizDetails/></Suspense>}></Route>
           <Route exact path="*" element={<Suspense fallback={<div>Component is loading please wait...</div>}><Pagenotfound/></Suspense>}></Route>
         </Routes>

@@ -84,15 +84,15 @@ export default function CreateChallenge({ challenges, setChallenges, type = 'Cre
         setChallenges(newChallenges);
     }
 
-    function isBase64(str) {
-        const base64Regex = /^(data:image\/[a-zA-Z]+;base64,)?[A-Za-z0-9+/=]+$/;
-        return base64Regex.test(str);
-    }
+    // function isBase64(str) {
+    //     const base64Regex = /^(data:image\/[a-zA-Z]+;base64,)?[A-Za-z0-9+/=]+$/;
+    //     return base64Regex.test(str);
+    // }
 
     const checkImage = (image) => {
         if (image) {
-            if (isBase64(image)) {
-                return image;
+            if (typeof image === 'string') {
+                return `http://localhost:5000/api/test/image/${image}`;
             }
             else {
                 return URL.createObjectURL(image);

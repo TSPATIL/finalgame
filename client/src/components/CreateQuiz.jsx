@@ -73,9 +73,9 @@ export default function CreateQuiz() {
                         // });
                     });
                 })
-                for (let [key, value] of formData.entries()) {
-                    console.log(key, value);
-                }
+                // for (let [key, value] of formData.entries()) {
+                //     console.log(key, value);
+                // }
                 const response = await dispatch(addTestAsync(formData));
                 const result = response.payload;
                 if (result.status) {

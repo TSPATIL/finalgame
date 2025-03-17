@@ -33,24 +33,24 @@ export default function ViewQuizDetails() {
         return date;
     }
 
-    function isBase64(str) {
-        const base64Regex = /^(data:image\/[a-zA-Z]+;base64,)?[A-Za-z0-9+/=]+$/;
-        return base64Regex.test(str);
-    }
+    // function isBase64(str) {
+    //     const base64Regex = /^(data:image\/[a-zA-Z]+;base64,)?[A-Za-z0-9+/=]+$/;
+    //     return base64Regex.test(str);
+    // }
 
-    const checkImageBufferOrBase64 = (image) => {
-        if (!image) return null;
+    // const checkImageBufferOrBase64 = (image) => {
+    //     if (!image) return null;
     
-        if (image.type === "Buffer") {
-            const buffer = Buffer.from(image.data);
-            return `data:image/png;base64,${buffer.toString('base64')}`;
-        }
-        else if (typeof image === 'string' && isBase64(image)) {
-            return `data:image/png;base64,${image}`;
-        }
+    //     if (image.type === "Buffer") {
+    //         const buffer = Buffer.from(image.data);
+    //         return `data:image/png;base64,${buffer.toString('base64')}`;
+    //     }
+    //     else if (typeof image === 'string' && isBase64(image)) {
+    //         return `data:image/png;base64,${image}`;
+    //     }
     
-        return null;
-    }
+    //     return null;
+    // }
 
     useEffect(() => {
         const fetchTestDetails = async () => {
@@ -67,14 +67,16 @@ export default function ViewQuizDetails() {
                     console.log(result.data);
                     setTest({ title: result.data.title, topic: result.data.topic, type: result.data.type, description: result.data.description, access: result.data.visibility, dueDate: result.data.testDueDate, })
                     setChallenges(result.data.challenges.map((challenge)=>{ 
-                        checkImageBufferOrBase64(challenge.previousStory.image);
+                        // checkImageBufferOrBase64(challenge.previousStory.image);
                         return {
                             title: challenge.title, 
                             codeExecute: challenge.codeExecution || '', 
                             preStory: challenge.previousStory?.story || '', 
-                            preImage: checkImageBufferOrBase64(challenge.previousStory?.image) || null,
+                            // preImage: checkImageBufferOrBase64(challenge.previousStory?.image) || null,
+                            preImage: challenge.previousStory?.image || null,
                             postStory: challenge.postStory?.story || '',
-                            postImage: checkImageBufferOrBase64(challenge.postStory?.image) || null,
+                            // postImage: checkImageBufferOrBase64(challenge.postStory?.image) || null,
+                            postImage: challenge.postStory?.image || null,
                             questions: challenge.questions.map((question) => {
                                 return {
                                     question: question.question,

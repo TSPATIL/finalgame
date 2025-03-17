@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { showAlert } from '../Redux/features/Alerts/AlertSlice';
 
-export default function ViewQuiz() {
+export default function ViewQuizAdmin() {
   const [tests, setTests] = useState([]);
   const [filteredTests, setFilteredTests] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -80,7 +80,7 @@ export default function ViewQuiz() {
     }
   }
   return (
-    <div className='ViewQuiz'>
+    <div className='ViewQuizAdmin'>
       <AdminNavbar />
       <div className="bg-gray-800 w-full min-h-screen flex items-center justify-center pt-28 pb-10 md:pt-16 md:pb-16">
         <div className="w-full min-h-full z-10 relative top-0 md:left-0 md:ml-[300px] flex justify-center items-center flex-col">
@@ -96,7 +96,7 @@ export default function ViewQuiz() {
               </form>
               <div className='w-full h-full grid grid-cols-1 mt-5'>
                 <p className='text-2xl text-white font-bold'>Results</p>
-                <div className="w-full text-black mt-5 flex justify-center items-center">
+                <div className="w-full text-black mt-5 grid grid-cols-1 gap-7">
                   {
                     filteredTests.length !== 0
                       ?

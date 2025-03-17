@@ -37,23 +37,24 @@ export default function UpdateQuiz() {
   }
 
   function isBase64(str) {
+    if(str === null) return false;
     const base64Regex = /^(data:image\/[a-zA-Z]+;base64,)?[A-Za-z0-9+/=]+$/;
     return base64Regex.test(str);
   }
 
-  const checkImageBufferOrBase64 = (image) => {
-    if (!image) return null;
+  // const checkImageBufferOrBase64 = (image) => {
+  //   if (!image) return null;
 
-    if (image.type === "Buffer") {
-      const buffer = Buffer.from(image.data);
-      return `data:image/png;base64,${buffer.toString('base64')}`;
-    }
-    else if (typeof image === 'string' && isBase64(image)) {
-      return `data:image/png;base64,${image}`;
-    }
+  //   if (image.type === "Buffer") {
+  //     const buffer = Buffer.from(image.data);
+  //     return `data:image/png;base64,${buffer.toString('base64')}`;
+  //   }
+  //   else if (typeof image === 'string' && isBase64(image)) {
+  //     return `data:image/png;base64,${image}`;
+  //   }
 
-    return null;
-  }
+  //   return null;
+  // }
 
   useEffect(() => {
     const fetchTestDetails = async () => {
@@ -70,14 +71,15 @@ export default function UpdateQuiz() {
           console.log(result.data);
           setTest({ title: result.data.title, topic: result.data.topic, type: result.data.type, description: result.data.description, access: result.data.visibility, dueDate: result.data.testDueDate, })
           setChallenges(result.data.challenges.map((challenge) => {
-            checkImageBufferOrBase64(challenge.previousStory.image);
             return {
               title: challenge.title,
               codeExecute: challenge.codeExecution || '',
               preStory: challenge.previousStory?.story || '',
-              preImage: checkImageBufferOrBase64(challenge.previousStory?.image) || null,
+              // preImage: checkImageBufferOrBase64(challenge.previousStory?.image) || null,
+              preImage: challenge.previousStory?.image || null,
               postStory: challenge.postStory?.story || '',
-              postImage: checkImageBufferOrBase64(challenge.postStory?.image) || null,
+              // postImage: checkImageBufferOrBase64(challenge.postStory?.image) || null,
+              postImage: challenge.postStory?.image || null,
               questions: challenge.questions.map((question) => {
                 return {
                   question: question.question,
@@ -111,18 +113,18 @@ export default function UpdateQuiz() {
     fetchTestDetails();
   }, []);
 
-  const base64ToFile = (base64, fileName, mimeType = "image/png") => {
-    const byteCharacters = atob(base64.split(',')[1]); // Remove metadata
-    const byteNumbers = new Array(byteCharacters.length);
+  // const base64ToFile = (base64, fileName, mimeType = "image/png") => {
+  //   const byteCharacters = atob(base64.split(',')[1]); // Remove metadata
+  //   const byteNumbers = new Array(byteCharacters.length);
     
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
+  //   for (let i = 0; i < byteCharacters.length; i++) {
+  //     byteNumbers[i] = byteCharacters.charCodeAt(i);
+  //   }
     
-    const byteArray = new Uint8Array(byteNumbers);
-    const file = new File([byteArray], fileName, { type: mimeType });
-    return file;
-  }; 
+  //   const byteArray = new Uint8Array(byteNumbers);
+  //   const file = new File([byteArray], fileName, { type: mimeType });
+  //   return file;
+  // };
 
   const handleStoryUpdate = async (e) => {
     try {
@@ -139,9 +141,11 @@ export default function UpdateQuiz() {
         challenges.forEach((challenge, cNo) => {
           if (challenge.title !== '') formData.append(`challenges[${cNo}][title]`, challenge.title);
           if (challenge.codeExecute !== '') formData.append(`challenges[${cNo}][codeExecution]`, challenge.codeExecute);
-          if (challenge.preImage !== '') formData.append(`challenges[${cNo}][previousStory][image]`, isBase64(challenge.preImage) ? base64ToFile(challenge.preImage): challenge.preImage);
+          // if (challenge.preImage !== '') formData.append(`challenges[${cNo}][previousStory][image]`, isBase64(challenge.preImage) ? base64ToFile(challenge.preImage): challenge.preImage);
+          if (challenge.preImage !== '') formData.append(`challenges[${cNo}][previousStory][image]`, challenge.preImage || null);
           if (challenge.preStory !== '') formData.append(`challenges[${cNo}][previousStory][story]`, challenge.preStory);
-          if (challenge.postImage !== '') formData.append(`challenges[${cNo}][postStory][image]`, isBase64(challenge.postImage) ? base64ToFile(challenge.postImage): challenge.postImage);
+          // if (challenge.postImage !== '') formData.append(`challenges[${cNo}][postStory][image]`, isBase64(challenge.postImage) ? base64ToFile(challenge.postImage): challenge.postImage);
+          if (challenge.postImage !== '') formData.append(`challenges[${cNo}][postStory][image]`, challenge.postImage || null);
           if (challenge.postStory !== '') formData.append(`challenges[${cNo}][postStory][story]`, challenge.postStory);
           if (challenge.teaching.teachingTopic !== '') formData.append(`challenges[${cNo}][teachings][topic]`, challenge.teaching.teachingTopic);
           if (challenge.teaching.teachingExplanation !== '') formData.append(`challenges[${cNo}][teachings][explanation]`, challenge.teaching.teachingExplanation);

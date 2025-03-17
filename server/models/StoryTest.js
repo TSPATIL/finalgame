@@ -14,7 +14,7 @@ const storyTestSchema = new Schema({
     },
     type: {
         type: String,
-        default: "Story-based-Test",
+        default: "Story-Based-Test",
         required: true
     },
     description: {
@@ -33,7 +33,9 @@ const storyTestSchema = new Schema({
         },
         previousStory: {
             image: {
-                type: Buffer,
+                // type: Buffer,
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "testImages"
             },
             story: {
                 type: String
@@ -41,7 +43,9 @@ const storyTestSchema = new Schema({
         },
         postStory: {
             image: {
-                type: Buffer,
+                // type: Buffer,
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "testImages"
             },
             story: {
                 type: String
