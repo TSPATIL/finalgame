@@ -112,7 +112,7 @@ export default function Landingpage() {
                     <div className="logo">QueryCraft</div>
                     <ul className="nav-links">
                         <li><Link to="/user/profile">Home</Link></li>
-                        <li><Link to="/user/editor">Game</Link></li>
+                        <li><Link to="/user/view-quiz">Game</Link></li>
                         {
                             !isLogin
                                 ?

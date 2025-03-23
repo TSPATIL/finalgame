@@ -42,9 +42,7 @@ const verifyUser = async (req, res, next) => {
                     return res.status(401).json({ status: false, error: 'Unauthorized: No auth token found' });
                 }
                 try{
-                    console.log(refreshToken)
                     const user = await userModel.findOne({ refreshToken });
-                    console.log(user)
                     
                     if(!user){
                         return res.status(401).json({status: false, error: 'Unauthorized. Invalid token'});

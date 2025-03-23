@@ -4,6 +4,8 @@ const { getGridFSBucket } = require("../configs/dbConnection");
 const storyTestModel = require("../models/StoryTest");
 const userModel = require("../models/User")
 const { Readable } = require("stream");
+const resultModel = require("../models/Result");
+const { predictDifficulty } = require("./PredictDifficulty");
 
 // const createTestStory = async (req, res) => {
 //     try {
@@ -61,72 +63,72 @@ const createTestStory = async (req, res) => {
             return res.status(401).json({ status: false, message: "Unauthorized" });
         }
         // if (req.params.type === 'Story-Based-Test') {
-            console.log("hello")
-            await Promise.all(req.files.map(async (file) => {
+        console.log("hello")
+        await Promise.all(req.files.map(async (file) => {
 
-                const { fieldname, buffer, originalname, mimetype } = file;
+            const { fieldname, buffer, originalname, mimetype } = file;
 
-                // Convert file buffer to a readable stream
-                const readableStream = new Readable();
-                readableStream.push(buffer);
-                readableStream.push(null);
+            // Convert file buffer to a readable stream
+            const readableStream = new Readable();
+            readableStream.push(buffer);
+            readableStream.push(null);
 
-                // Upload file to GridFS
-                const uploadStream = gridfsBucket.openUploadStream(originalname, { contentType: mimetype });
-                readableStream.pipe(uploadStream);
+            // Upload file to GridFS
+            const uploadStream = gridfsBucket.openUploadStream(originalname, { contentType: mimetype });
+            readableStream.pipe(uploadStream);
 
-                // Wait for upload to finish and get the file ID
-                await new Promise((resolve, reject) => {
-                    uploadStream.on("finish", async () => {
-                        const fileId = uploadStream.id.toString(); // New GridFS file ID
+            // Wait for upload to finish and get the file ID
+            await new Promise((resolve, reject) => {
+                uploadStream.on("finish", async () => {
+                    const fileId = uploadStream.id.toString(); // New GridFS file ID
 
-                        const matchPrev = fieldname.match(/\[(\d+)\]\[previousStory\]\[image\]/);
-                        const matchPost = fieldname.match(/\[(\d+)\]\[postStory\]\[image\]/);
+                    const matchPrev = fieldname.match(/\[(\d+)\]\[previousStory\]\[image\]/);
+                    const matchPost = fieldname.match(/\[(\d+)\]\[postStory\]\[image\]/);
 
-                        if (matchPrev) {
-                            const index = matchPrev[1];
-                            // req.body.challenges[index] = req.body.challenges[index] || {};
-                            // req.body.challenges[index].postStory = req.body.challenges[index].postStory || {};
+                    if (matchPrev) {
+                        const index = matchPrev[1];
+                        // req.body.challenges[index] = req.body.challenges[index] || {};
+                        // req.body.challenges[index].postStory = req.body.challenges[index].postStory || {};
 
-                            req.body.challenges[index].previousStory.image = fileId;
-                        }
+                        req.body.challenges[index].previousStory.image = fileId;
+                    }
 
-                        if (matchPost) {
-                            const index = matchPost[1];
+                    if (matchPost) {
+                        const index = matchPost[1];
 
-                            // req.body.challenges[index] = req.body.challenges[index] || {};
-                            // req.body.challenges[index].postStory = req.body.challenges[index].postStory || {};
+                        // req.body.challenges[index] = req.body.challenges[index] || {};
+                        // req.body.challenges[index].postStory = req.body.challenges[index].postStory || {};
 
-                            req.body.challenges[index].postStory.image = fileId;
-                        }
+                        req.body.challenges[index].postStory.image = fileId;
+                    }
 
-                        resolve();
-                    });
-
-                    uploadStream.on("error", (err) => reject(err));
+                    resolve();
                 });
-            }));
 
-            req.body.challenges.forEach((challenge, index) => {
-                if (challenge.previousStory?.image) {
-                    if (challenge.previousStory.image === 'null') {
-                        req.body.challenges[index].previousStory.image = null;
-                    } else if (typeof challenge.previousStory.image === "string") {
-                        req.body.challenges[index].previousStory.image = challenge.previousStory.image;
-                    }
-                }
-                if (challenge.postStory?.image) {
-                    if (challenge.postStory.image === 'null') {
-                        req.body.challenges[index].postStory.image = null;
-                    } else if (typeof challenge.postStory.image === "string") {
-                        req.body.challenges[index].postStory.image = challenge.postStory.image;
-                    }
-                }
+                uploadStream.on("error", (err) => reject(err));
             });
+        }));
 
-            req.body.createdBy = user._id;
-            const test = new storyTestModel(req.body);
-            await test.save();
+        req.body.challenges.forEach((challenge, index) => {
+            if (challenge.previousStory?.image) {
+                if (challenge.previousStory.image === 'null') {
+                    req.body.challenges[index].previousStory.image = null;
+                } else if (typeof challenge.previousStory.image === "string") {
+                    req.body.challenges[index].previousStory.image = challenge.previousStory.image;
+                }
+            }
+            if (challenge.postStory?.image) {
+                if (challenge.postStory.image === 'null') {
+                    req.body.challenges[index].postStory.image = null;
+                } else if (typeof challenge.postStory.image === "string") {
+                    req.body.challenges[index].postStory.image = challenge.postStory.image;
+                }
+            }
+        });
+
+        req.body.createdBy = user._id;
+        const test = new storyTestModel(req.body);
+        await test.save();
         // }
         // else if (req.params.type === 'MCQ-based-Test') {
 
@@ -134,7 +136,7 @@ const createTestStory = async (req, res) => {
         // else {
         //     return res.status(400).json({ status: false, message: "Test Type does not available", error: "Test Type does not available" })
         // }
-        res.status(201).json({ status: true, message: "Test created successfully"});
+        res.status(201).json({ status: true, message: "Test created successfully" });
     } catch (error) {
         console.error(error);
         res.status(500).json({ status: false, message: "Internal server error", error });
@@ -402,4 +404,215 @@ const getImage = async (req, res) => {
     }
 };
 
-module.exports = { createTestStory, getAllTests, getTestsById, deleteTestById, updateTestById, getImage };
+const getTestAndResults = async (req, res) => {
+    try {
+        let user = await userModel.findOne({ email: req.user.email }).select('-password -_v');
+        if (!user) {
+            return res.status(400).json({ status: false, message: "No user exists", error: "No user exists" });
+        }
+        if (req.user.uid !== user.firebaseId) {
+            return res.status(401).json({ status: false, message: "Unauthorized", error: "Unauthorized" });
+        }
+        const tests = await storyTestModel.find().select('-challenges -totalPoints -_v');
+        const results = await resultModel.find({ userId: user._id }).select('_id testId type title topic currentChallengeNo totalActualChallenges status start_time end_time');
+        res.status(200).json({ status: true, message: "Test Fetched Successfully", data: { tests, results } });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: false, error, message: 'Internal server error', error });
+    }
+}
+
+const createTestResult = async (req, res) => {
+    try {
+        let user = await userModel.findOne({ email: req.user.email }).select('-password -_v');
+        if (!user) {
+            return res.status(400).json({ status: false, message: "No user exists", error: "No user exists" });
+        }
+        if (req.user.uid !== user.firebaseId) {
+            return res.status(401).json({ status: false, message: "Unauthorized", error: "Unauthorized" });
+        }
+        const test = await storyTestModel.findById(req.params.testId).select('_id title topic type challenges');
+        if (test.type !== req.params.type) {
+            return res.status(400).json({ status: false, message: "Test not found", error: "Test not found" });
+        }
+        const query = "";
+        const queryOutput = "";
+        const result = await resultModel({
+            userId: user._id,
+            testId: test._id,
+            title: test.title,
+            topic: test.topic,
+            type: test.type,
+            totalActualChallenges: test.challenges?.length || 0,
+            codeExecutionHistory: [{
+                code: query,
+                output: queryOutput,
+                executor: "server"
+            }],
+            challengesProgress: [{
+                difficulty: "easy",
+                attempts: 0
+            }]
+        });
+        const savedResult = await result.save();
+        res.status(201).json({ status: true, message: "Test Session Created", resultId: savedResult._id });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: false, error, message: 'Internal server error', error });
+    }
+}
+
+const fetchTestCurrentChallenge = async (req, res) => {
+    try {
+        const result = await resultModel.findById(req.params.resultId).select('currentChallengeNo testId totalActualChallenges codeExecutionHistory challengesProgress startTime'); 
+        if (!result) {
+            return res.status(400).json({ status: false, message: "Invalid Test Session ID", error: "Invalid Test Session ID" })
+        }
+        if(result.currentChallengeNo === result.totalActualChallenges){
+            await resultModel.findByIdAndUpdate(req.params.resultId, {$set: {[`status`]: "Passed"}})
+            return res.status(200).json({status: true, message: "You have successfully completed the test."})
+        }
+        if((Date.now() - new Date(result.startTime).getTime()) > 24*60*60*1000){
+            await resultModel.findByIdAndUpdate(req.params.resultId, {$set: {[`status`]: "Failed"}})
+            return res.status(200).json({status: true, message: "You cannot complete test within time limit"});
+        }
+        const test = await storyTestModel.findOne(
+            { _id: result.testId },
+            { challenges: { $slice: [result.currentChallengeNo, 1] } }
+        )
+        if (!test) {
+            return res.status(400).json({ status: false, message: "Invalid Test ID", error: "Invalid Test ID" })
+        }
+        if (!test.challenges.length) {
+            return res.status(400).json({ status: false, message: "Challenge Not Found", error: "Challenge Not Found" })
+        }
+        let difficulty = result.challengesProgress[result.currentChallengeNo].difficulty;
+        difficulty = difficulty === 'easy' ? 0 : difficulty === 'medium' ? 1 : 2;
+        const currentChallenge = test.challenges[0];
+        const currentChallengeData = {
+            challengeNo: result.currentChallengeNo,
+            codeExecutionHistory: result.codeExecutionHistory,
+            title: currentChallenge.title,
+            previousStory: currentChallenge.previousStory,
+            postStory: currentChallenge.postStory,
+            question: currentChallenge.questions[difficulty]?.question || "",
+            difficulty: currentChallenge.questions[difficulty]?.difficulty || "",
+            constraints: currentChallenge.questions[difficulty]?.constraints || "",
+            keywords: currentChallenge.questions[difficulty]?.keywords || "",
+            example: currentChallenge.questions[difficulty]?.example || [],
+            teachings: currentChallenge.teachings,
+        }
+        res.status(200).json({ status: true, message: "Challenge fetched successfully", data: currentChallengeData })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: false, error, message: 'Internal server error', error });
+    }
+}
+
+const submitChallenge = async (req, res) => {
+    try {
+        const result = await resultModel.findById(req.params.resultId).select('currentChallengeNo testId challengesProgress totalActualChallenges');
+        if (!result) {
+            return res.status(400).json({ status: false, message: "Invalid Test Session ID", error: "Invalid Test Session ID" })
+        }
+        const test = await storyTestModel.findOne(
+            { _id: result.testId },
+            { 
+                challenges: { $slice: [result.currentChallengeNo, 1] },
+            }
+        )
+        if (!test) {
+            return res.status(400).json({ status: false, message: "Invalid Test ID", error: "Invalid Test ID" })
+        }
+        if (!test.challenges.length) {
+            return res.status(400).json({ status: false, message: "Challenge Not Found", error: "Challenge Not Found" })
+        }
+        const { question, answer, difficulty, constraints, keywords } = req.body;
+        const isCorrect = test.challenges[0].questions[difficulty === 'easy' ? 0 : difficulty === 'medium' ? 1 : 2].answer === answer
+        let updateQuery = {}
+        if(result.challengesProgress[result.currentChallengeNo]){
+            updateQuery.$inc = {[`challengesProgress.${result.currentChallengeNo}.attempts`]: 1};
+        }
+        // else{
+        //     updateQuery.$push = {
+        //         challengesProgress: {
+        //             $each: [{
+        //                 difficulty: ['easy', 'medium', 'hard'][Math.floor(Math.random()*(2-0+1))+0],
+        //                 attempts: 1,
+        //             }],
+        //             $position: result.currentChallengeNo
+        //         }
+        //     }
+        // }
+        await resultModel.findByIdAndUpdate(req.params.resultId, updateQuery);
+        updateQuery = {}
+        if(isCorrect){
+            const endDate = Date.now();
+            updateQuery.$set = {
+                [`challengesProgress.${result.currentChallengeNo}.question`]: question,
+                [`challengesProgress.${result.currentChallengeNo}.answer`]: answer,
+                [`challengesProgress.${result.currentChallengeNo}.pointEarned`]: 100,
+                [`challengesProgress.${result.currentChallengeNo}.constraints`]: constraints,
+                [`challengesProgress.${result.currentChallengeNo}.keywords`]: keywords,
+                [`challengesProgress.${result.currentChallengeNo}.endTime`]: endDate,
+                [`challengesProgress.${result.currentChallengeNo}.timeTaken`]: endDate - new Date(result.challengesProgress[result.currentChallengeNo].startTime).getTime(),
+            };
+            updateQuery.$inc = {};
+            updateQuery.$inc.currentChallengeNo = 1;
+        }
+        const query = answer;
+        const queryOutput = '';
+        if (query) {
+            updateQuery.$push = {};
+            updateQuery.$push.codeExecutionHistory = {
+                code: query,
+                output: queryOutput,
+                executor: "user"
+            };
+        }
+        console.log(updateQuery);
+        await resultModel.findByIdAndUpdate(req.params.resultId, updateQuery);
+        if(isCorrect){
+            if(result.currentChallengeNo + 1 < result.totalActualChallenges){
+                const nextTest = await storyTestModel.findOne(
+                    { _id: result.testId },
+                    { 
+                        challenges: { $slice: [result.currentChallengeNo+1, 1] },
+                    }
+                )
+                
+                const response = await predictDifficulty(result.challengesProgress);
+                let difficulty = response.nextDifficulty;
+                if(response.error){
+                    console.log(error);
+                    difficulty = result.challengesProgress[result.currentChallengeNo].difficulty
+                }
+                await resultModel.findByIdAndUpdate(req.params.resultId, {
+                    $push: {
+                        [`codeExecutionHistory`]: {
+                            code: nextTest.challenges.codeExecution,
+                            output: "",
+                            executer: "server"
+                        },
+                        [`challengesProgress`]: {
+                            $each: [{
+                                difficulty: difficulty,
+                                attempts: 1,
+                            }],
+                            $position: result.currentChallengeNo+1
+                        }
+                    }
+                });
+            }
+            res.status(200).json({status: true, message: "Answer is correct"});
+        }
+        else{
+            res.status(200).json({status: true, message: "Answer is incorrect", error: "Answer is incorrect"});
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: false, error, message: 'Internal server error', error });
+    }
+}
+
+module.exports = { createTestStory, getAllTests, getTestsById, deleteTestById, updateTestById, getImage, getTestAndResults, createTestResult, fetchTestCurrentChallenge, submitChallenge };

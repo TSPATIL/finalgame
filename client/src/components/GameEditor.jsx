@@ -7,8 +7,11 @@ import { IoMdClose } from "react-icons/io";
 import { useStopwatch } from 'react-timer-hook';
 import Confetti from 'react-confetti';
 import LoginModal from './LoginModal';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectIsLogin } from '../Redux/features/Authentication/AuthenticationSlice';
+import { useParams } from 'react-router-dom';
+import { showAlert } from '../Redux/features/Alerts/AlertSlice';
+import ExitModal from './ExitModal';
 
 function MyStopwatch() {
     const {
@@ -37,13 +40,75 @@ function MyStopwatch() {
 }
 
 export default function GameEditor() {
+    const { id } = useParams();
+    const dispatch = useDispatch();
+    const [challenge, setChallenge] = useState({ challengeNo: 0, title: '', previousStory: '', preImage: '', postStory: '', postImage: '', question: '', answer: '', difficulty: '', constraints: '', keywords: '', example: [{ question: '', answer: '', explanation: '' }], teachings: { topic: '', explanation: '' } });
+    const [codeExecutionHistory, setCodeExecutionHistory] = useState([]);
+    const [attempts, setAttempts] = useState(0);
+    const [showPostStory, setShowPostStory] = useState(false);
+    const [isTestEnd, setIsTestEnd] = useState(false);
+    useEffect(() => {
+        const fetchCurrentChallenge = async () => {
+            try {
+                const response = await fetch(`http://localhost:5000/api/test/get-current-challenge/${id}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include"
+                });
+                const result = await response.json();
+                if (result.status) {
+                    if(result.message === "You have successfully completed the test."){
+                        setIsConfettiVisible(true);
+                        setTimeout(() => setIsConfettiVisible(false), 5000);
+                        dispatch(showAlert({ message: result.message, type: "success" }))
+                        setIsTestEnd(true);
+                        return;
+                    }
+                    setChallenge({
+                        challengeNo: result.data.challengeNo,
+                        title: result.data.title,
+                        previousStory: result.data.previousStory.story,
+                        preImage: result.data.previousStory.image,
+                        postStory: result.data.postStory.story,
+                        postImage: result.data.postStory.image,
+                        question: result.data.question,
+                        answer: '',
+                        difficulty: result.data.difficulty,
+                        constraints: result.data.constraints,
+                        keywords: result.data.keywords,
+                        teachings: {
+                            topic: result.data.teachings.topic,
+                            explanation: result.data.teachings.explanation
+                        },
+                        example: result.data.example?.map((ex) => {
+                            return {
+                                question: ex.question || '',
+                                answer: ex.answer || '',
+                                explanation: ex.explanation || ''
+                            }
+                        }) || []
+                    });
+                    setCodeExecutionHistory(result.data.codeExecutionHistory);
+                    setAttempts(result.data.attempts || 0);
+                    setShowPostStory(false);
+                    dispatch(showAlert({ message: result.message, type: "success" }))
+                }
+                else {
+                    console.log(result.error)
+                    dispatch(showAlert({ message: "Error occured while test details fetched", type: "error" }))
+                }
+                console.log(challenge);
+            } catch (error) {
+                console.log(error)
+                dispatch(showAlert({ message: "Error Occured", type: "error" }))
+            }
+        }
+        fetchCurrentChallenge();
+    }, [challenge.challengeNo]);
 
-    // useEffect(() => {
-    //     const confetti = confettiRef.current;
-    //     const context = confetti.getContext('2d');
-    // }, []);
-
-    var elem = document.getElementById('GameWditor');
+    // var elem = document.getElementById('GameWditor');
 
     const appRef = useRef(null);
 
@@ -87,14 +152,6 @@ export default function GameEditor() {
         document.getElementById('reset').click();
     }
 
-    const [attempts, setAttempts] = useState(3);
-
-    const handleAttemptsZero = () => {
-        setAttempts(0)
-        alert('Attempts finished');
-        pauseTime();
-    }
-
     const [menu, setMenu] = useState(false);
 
     const handleMenu = () => {
@@ -102,95 +159,173 @@ export default function GameEditor() {
     }
 
     const [isConfettiVisible, setIsConfettiVisible] = useState(false);
-    const handleSubmit = (e)=>{
-        // const confetti = confettiRef.current;
-        // const context = confetti.getContext('2d');
-        setIsConfettiVisible(true);
-        setTimeout(() => setIsConfettiVisible(false), 5000);
+    const handleSubmit = async (e) => {
+        if(confirm('Are you sure to submit the code')){
+        try {
+            const response = await fetch(`http://localhost:5000/api/test/submit-challenge/${id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({question: challenge.question, answer: challenge.answer, difficulty: challenge.difficulty, constraints: challenge.constraints, keywords: challenge.keywords}),
+                credentials: "include"
+            })
+            const result = await response.json();
+            if (result.status) {
+                if (result.error) {
+                    console.log(result.error)
+                    dispatch(showAlert({ message: result.message, type: "error" }))
+                }
+                else {
+                    dispatch(showAlert({ message: result.message, type: "success" }))
+                    setShowPostStory(true);
+                    setIsConfettiVisible(true);
+                    setTimeout(() => setIsConfettiVisible(false), 5000);
+                }
+            }
+            else {
+                console.log(result.error)
+                dispatch(showAlert({ message: "Error occured while test details fetched", type: "error" }))
+            }
+        } catch (error) {
+            console.log(error)
+            dispatch(showAlert({ message: "Error occured while test details fetched", type: "error" }))
+        }
+    }
+    }
+
+    const handleOnChange = (value) => {
+        console.log(value)
+      setChallenge({...challenge, ['answer']: value});
+      console.log(challenge)
+    }
+
+    const handleOnClickNextChallenge = ()=>{
+        setChallenge({...challenge, ['challengeNo']: challenge.challengeNo+1});
     }
 
     const [btn, setBtn] = useState(true);
-    
+
     const isLogin = useSelector(selectIsLogin)
     return (
         <div>
-        <div ref={appRef} id='GameEditor' className='GameEditor bg-gray-900 overflow-hidden'>
-            {isConfettiVisible && <Confetti className='' numberOfPieces={500} />}
-            <div className='menu h-[80px] w-full flex justify-between items-center px-6'>
-                <div className='flex justify-center items-center w-fit'>
-                    <div className="bg-gradient-to-b from-yellow-400 to-yellow-700 bg-clip-text text-transparent w-fit drop-shadow-2xl font-medium text-gray-300 text-[27px] sm:text-[40px] tracking-[0] leading-[normal] whitespace-nowrap shadow-drop-shadow-100">
-                        Qᵘᵉʳʸ ᶜʳᵃᶠᵗ
+            <div ref={appRef} id='GameEditor' className='GameEditor bg-gray-900 overflow-hidden'>
+                {isConfettiVisible && <Confetti className='w-full' numberOfPieces={500} />}
+                <div className='menu h-[80px] w-full flex justify-between items-center px-6'>
+                    <div className='flex justify-center items-center w-fit'>
+                        <div className="bg-gradient-to-b from-yellow-400 to-yellow-700 bg-clip-text text-transparent w-fit drop-shadow-2xl font-medium text-gray-300 text-[27px] sm:text-[40px] tracking-[0] leading-[normal] whitespace-nowrap shadow-drop-shadow-100">
+                            Qᵘᵉʳʸ ᶜʳᵃᶠᵗ
+                        </div>
+                        <div className="w-[150px] relative -left-16 top-4 sm:-left-28 sm:top-5 bg-gradient-to-b from-yellow-300 to-yellow-700 bg-clip-text text-transparent text-[8px] sm:text-[12px] font-bold tracking-[0] leading-[normal]">
+                            The Hogwarts Enigma
+                        </div>
                     </div>
-                    <div className="w-[150px] relative -left-16 top-4 sm:-left-28 sm:top-5 bg-gradient-to-b from-yellow-300 to-yellow-700 bg-clip-text text-transparent text-[8px] sm:text-[12px] font-bold tracking-[0] leading-[normal]">
-                        The Hogwarts Enigma
+                    <div className='absolute cursor-pointer left-0 right-0 mx-auto lg:flex hidden justify-center items-center gap-2 top-5 w-fit h-fit text-4xl text-black py-1 px-2 rounded-lg'>
+                        <div className='cursor-pointer flex justify-center items-center top-5 w-fit h-fit text-4xl text-black bg-white py-1 px-2 rounded-lg'>
+                            <div className='text-lg -top-3 mr-2'>Time:</div>
+                            <MyStopwatch />
+                        </div>
+                        <div className='cursor-pointer flex justify-center items-center top-5 w-fit h-fit text-4xl text-black bg-white py-1 px-2 rounded-lg'>
+                            <div className='text-lg -top-3 mr-2'>Attempts Taken:</div>
+                            <div>{attempts}</div>
+                        </div>
                     </div>
-                </div>
-                <div className='absolute cursor-pointer left-0 right-0 mx-auto lg:flex hidden justify-center items-center gap-2 top-5 w-fit h-fit text-4xl text-black py-1 px-2 rounded-lg'>
-                    <div className='cursor-pointer flex justify-center items-center top-5 w-fit h-fit text-4xl text-black bg-white py-1 px-2 rounded-lg'>
-                        <div className='text-lg -top-3 mr-2'>Time:</div>
-                        <MyStopwatch />
-                    </div>
-                    <div className='cursor-pointer flex justify-center items-center top-5 w-fit h-fit text-4xl text-black bg-white py-1 px-2 rounded-lg'>
-                        <div className='text-lg -top-3 mr-2'>Attempts Left:</div>
-                        <div>{attempts}</div>
-                    </div>
-                </div>
-                <div className='w-fit flex justify-end items-center gap-1'>
-                    <div>
-                        {
-                            !menu
-                                ?
-                                <AiOutlineMenu onClick={handleMenu} className='cursor-pointer w-fit text-3xl sm:text-4xl text-gold bg-white p-1 rounded-md font-bold' />
-                                :
-                                <IoMdClose onClick={handleMenu} className='cursor-pointer w-fit text-3xl sm:text-4xl text-gold bg-white p-1 rounded-md font-bold' />
-                        }
-                    </div>
-                    <div>
-                        {
-                            !fullScreen
-                                ?
-                                <MdFullscreen onClick={enterFullScreen} className={`cursor-pointer w-fit text-3xl sm:text-4xl text-gold bg-white p-1 rounded-md font-bold`} />
-                                :
-                                <MdFullscreenExit onClick={exitFullScreen} className={`cursor-pointer w-fit text-3xl sm:text-4xl text-gold bg-white p-1 rounded-md font-bold`} />
-                        }
-                    </div>
-                </div>
-            </div>
-            <div className='lg:flex w-full h-full lg:h-[90vh] justify-center items-center'>
-                <div className='w-full lg:w-1/2 h-full flex justify-center items-center flex-col'>
-                    <div className='w-full h-[400px] lg:h-3/5 flex justify-center items-center px-2 p-1'>
-                        <iframe className='w-full h-full border-[1px] rounder-md border-white' src="https://www.youtube.com/embed/NthGfn_ddRQ?autoplay=1&controls=0&loop=1" title="YouTube video player" autoPlay frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
-                    </div>
-                    <div className='w-full min-h-[200px] lg:h-2/5 flex justify-center items-center px-2 py-1'>
-                        <div className='flex justify-between items-center flex-col w-full h-full border-[1px] border-white rounded-lg'>
-                            <div className='options h-1/6 w-full flex justify-start items-center font-bold px-3 rounded-tr-lg rounded-tl-lg bg-gray-800 text-white border-b-[1px] border-white'>
-                                <div onClick={() => { setBtn(true) }} className='px-3 py-2 bg-blue-700 hover:bg-blue-800 cursor-pointer'>Challenge</div>
-                                <div onClick={() => { setBtn(false) }} className='px-3 py-2 bg-blue-700 hover:bg-blue-800 cursor-pointer'>Recommendation</div>
-                            </div>
-                            <div className='h-5/6 w-full bg-gray-800 text-gray-300  rounded-bl-lg rounded-br-lg'>
-                                {
-                                    btn ?
-                                        <div className='h-full w-full p-2 overflow-y-auto space-y-1 text-justify'>
-                                            <p className='text-xl font-bold'>Challenge No: <span className='text-base text-gray-400'>1</span></p>
-                                            <p className='text-xl font-bold'>Title: <span className='text-base text-gray-400'>Let's Begin</span></p>
-                                            <p className='text-xl font-bold'>Description: <span className='text-base text-gray-400'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum reprehenderit ad itaque consequuntur cupiditate laborum quae tenetur ducimus suscipit possimus ratione maxime voluptate minima autem repellendus vitae provident, sint soluta obcaecati? Laborum eveniet commodi distinctio quod ea voluptatem tenetur accusamus.</span></p>
-                                            <p className='text-xl font-bold'>Scenario: <span className='text-base text-gray-400'>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quibusdam, necessitatibus autem expedita recusandae dignissimos eum tenetur excepturi dolor minus maiores?</span></p>
-                                        </div>
-                                        :
-                                        <div className='h-full w-full p-2 overflow-y-auto space-y-1 text-justify'>
-                                            <p className="text-xl font bold">Concepts: <span className="text-base text-gray-400">SQL JOIN, SELECT</span></p>
-                                            <p className="text-base font bold">We recommend you to solve the problem with above concepts.</p>
-                                        </div>
-                                }
-                            </div>
+                    <div className='w-fit flex justify-end items-center gap-1'>
+                        <div>
+                            {
+                                !menu
+                                    ?
+                                    <AiOutlineMenu onClick={handleMenu} className='cursor-pointer w-fit text-3xl sm:text-4xl text-gold bg-white p-1 rounded-md font-bold' />
+                                    :
+                                    <IoMdClose onClick={handleMenu} className='cursor-pointer w-fit text-3xl sm:text-4xl text-gold bg-white p-1 rounded-md font-bold' />
+                            }
+                        </div>
+                        <div>
+                            {
+                                !fullScreen
+                                    ?
+                                    <MdFullscreen onClick={enterFullScreen} className={`cursor-pointer w-fit text-3xl sm:text-4xl text-gold bg-white p-1 rounded-md font-bold`} />
+                                    :
+                                    <MdFullscreenExit onClick={exitFullScreen} className={`cursor-pointer w-fit text-3xl sm:text-4xl text-gold bg-white p-1 rounded-md font-bold`} />
+                            }
                         </div>
                     </div>
                 </div>
-                <div className='w-full lg:w-1/2 h-full flex justify-center items-center flex-col'>
-                    <div className='w-full h-[400px] lg:h-3/5 flex justify-center items-center px-2 py-1'>
-                        <div className='w-full h-full bg-gray-800 overflow-auto border-[1px] rounded-lg border-white p-2'>
-                            <div className='text-lg text-white'>
-                                <p>Select * from Country;</p>
+                <div className='lg:flex w-full h-full lg:h-[90vh] justify-center items-center'>
+                    <div className='w-full lg:w-1/2 h-full flex justify-center items-center flex-col'>
+                        <div className='w-full h-[400px] lg:h-3/5 flex justify-center items-center px-2 p-1'>
+                            <img loading='lazy' className='w-full h-full border-[1px] rounder-md border-white' src={`http://localhost:5000/api/test/image/${!showPostStory ? challenge.preImage : challenge.postImage}`} title="YouTube video player" autoPlay frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></img>
+                        </div>
+                        <div className='w-full min-h-[200px] lg:h-2/5 flex justify-center items-center px-2 py-1'>
+                            <div className='flex justify-between items-center flex-col w-full h-full border-[1px] border-white rounded-lg'>
+                                <div className='options h-1/6 w-full flex justify-start items-center font-bold rounded-tr-lg rounded-tl-lg bg-gray-800 text-white border-b-[1px] border-white text-lg'>
+                                    <div onClick={() => { setBtn(true) }} className='px-3 py-2 h-full bg-blue-700 rounded-tl-lg hover:bg-blue-800 cursor-pointer flex justify-center items-center'>Challenge</div>
+                                    <div onClick={() => { setBtn(false) }} className='px-3 py-2 h-full bg-blue-700 hover:bg-blue-800 cursor-pointer flex justify-center items-center'>Recommendation</div>
+                                </div>
+                                <div className='h-5/6 w-full bg-gray-800 text-gray-300  rounded-bl-lg rounded-br-lg'>
+                                    {
+                                        btn ?
+                                            <div className='h-full w-full p-2 overflow-y-auto space-y-1 text-justify text-[gold]'>
+                                                <p className='text-xl font-bold'>Challenge No: <span className='text-lg text-white font-normal'>{challenge.challengeNo}</span></p>
+                                                <p className='text-xl font-bold'>Title: <span className='text-lg text-white font-normal'>{challenge.title}</span></p>
+                                                {
+                                                    !showPostStory
+                                                        ?
+                                                        <div>
+                                                            <p className='text-xl font-bold'>Description:</p>
+                                                            <p className='text-lg text-white font-normal'>{challenge.previousStory}</p>
+                                                            <p className='text-xl font-bold'>Scenario:</p>
+                                                            <p className='text-lg text-white font-normal'>{challenge.question}</p>
+                                                            <div className='text-xl font-bold'>
+                                                                <p>Constraints:</p>
+                                                                {
+                                                                    challenge.constraints
+                                                                        ?
+                                                                        challenge.constraints.split(", ").map((constraint, index) => {
+                                                                            return (
+                                                                                <p className='text-lg text-white font-normal'>{index + ". " + constraint}</p>
+                                                                            )
+                                                                        })
+                                                                        :
+                                                                        <span className='text-lg text-white font-normal'>'None'</span>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        :
+                                                        <div>
+                                                            <p className='text-xl font-bold'>Description:</p>
+                                                            <p className='text-lg text-white font-normal'>{challenge.postStory}</p>
+                                                        </div>
+                                                }
+                                            </div>
+                                            :
+                                            <div className='h-full w-full p-2 overflow-y-auto space-y-1 text-justify text-[gold]'>
+                                                <div className='text-xl font-bold'>
+                                                    <p>Concepts:</p>
+                                                    {
+                                                        challenge.keywords
+                                                            ?
+                                                            challenge.keywords.split(", ").map((keyword, index) => {
+                                                                return (
+                                                                    <p className='text-lg text-white font-normal'>{(index + 1) + ". " + keyword.toLowerCase()}</p>
+                                                                )
+                                                            })
+                                                            :
+                                                            <span className='text-lg text-white font-normal'>'None'</span>
+                                                    }
+                                                </div>
+                                                <p className="text-lg text-white font bold">We recommend you to solve the problem with above concepts.</p>
+                                            </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className='w-full lg:w-1/2 h-full flex justify-center items-center flex-col'>
+                        <div className='w-full h-[400px] lg:h-3/5 flex justify-center items-center px-2 py-1'>
+                            <div className='w-full h-full bg-gray-800 overflow-auto border-[1px] rounded-lg border-white p-2'>
+                                <div className='text-lg text-white'>
+                                    {/* <p>Select * from Country;</p>
                                 <table className='mb-3 border-2 border-white'>
                                     <tbody>
                                         <tr className='border-2 border-white'>
@@ -210,45 +345,55 @@ export default function GameEditor() {
                                         </tr>
                                     </tbody>
                                 </table>
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis sed iusto nesciunt ab architecto omnis accusamus earum asperiores deleniti accusantium veniam nulla repudiandae consectetur modi rem aut voluptatibus, minus dignissimos tenetur! Possimus repudiandae voluptates ex minima quisquam cupiditate aliquid ab ipsum quam dolor eum ducimus aliquam a iusto, at reiciendis quos illum repellat voluptatem necessitatibus incidunt veritatis numquam. Harum aliquid assumenda voluptate, maiores exercitationem quaerat temporibus dolorem libero ipsa molestias quos dignissimos magni est amet, quae quod? Saepe, ex libero.
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis sed iusto nesciunt ab architecto omnis accusamus earum asperiores deleniti accusantium veniam nulla repudiandae consectetur modi rem aut voluptatibus, minus dignissimos tenetur! Possimus repudiandae voluptates ex minima quisquam cupiditate aliquid ab ipsum quam dolor eum ducimus aliquam a iusto, at reiciendis quos illum repellat voluptatem necessitatibus incidunt veritatis numquam. Harum aliquid assumenda voluptate, maiores exercitationem quaerat temporibus dolorem libero ipsa molestias quos dignissimos magni est amet, quae quod? Saepe, ex libero. */}
+                                    {codeExecutionHistory.map((obj, index) => {
+                                        return (
+                                            <div key={obj + " " + index}>
+                                                <p>code: {obj.code}</p>
+                                                <p>output: {obj.output}</p>
+                                                <p>executor: {obj.executor}</p>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div className='w-full h-[100px] lg:h-1/5 lg:hidden flex justify-center items-center gap-2 px-2 py-1'>
-                        <div className='cursor-pointer flex justify-center items-center top-5 w-fit h-fit text-4xl text-black bg-white py-1 px-2 rounded-lg'>
-                            <div className='text-lg -top-3 mr-2'>Time:</div>
-                            <MyStopwatch />
+                        <div className='w-full h-[100px] lg:h-1/5 lg:hidden flex justify-center items-center gap-2 px-2 py-1'>
+                            <div className='cursor-pointer flex justify-center items-center top-5 w-fit h-fit text-4xl text-black bg-white py-1 px-2 rounded-lg'>
+                                <div className='text-lg -top-3 mr-2'>Time:</div>
+                                <MyStopwatch />
+                            </div>
+                            <div className='cursor-pointer flex justify-center items-center top-5 w-fit h-fit text-4xl text-black bg-white py-1 px-2 rounded-lg'>
+                                <div className='text-lg -top-3 mr-2'>Attempts Taken:</div>
+                                <div>{attempts}</div>
+                            </div>
                         </div>
-                        <div className='cursor-pointer flex justify-center items-center top-5 w-fit h-fit text-4xl text-black bg-white py-1 px-2 rounded-lg'>
-                            <div className='text-lg -top-3 mr-2'>Attempts Left:</div>
-                            <div>2</div>
+                        <div className='w-full h-2/5 flex justify-center items-center px-2 py-1'>
+                            <EditorInput handleSubmit={handleSubmit} startTime={startTime} answer={challenge.answer} handleOnChange={handleOnChange} pauseTime={pauseTime} resetTime={resetTime} setAttempts={setAttempts} attempts={attempts} showPostStory={showPostStory} handleOnClickNextChallenge={handleOnClickNextChallenge} />
                         </div>
-                    </div>
-                    <div className='w-full h-2/5 flex justify-center items-center px-2 py-1'>
-                        <EditorInput handleSubmit={handleSubmit} startTime={startTime} pauseTime={pauseTime} resetTime={resetTime} setAttempts={setAttempts} attempts={attempts} handleAttemptsZero={handleAttemptsZero} />
                     </div>
                 </div>
-            </div>
-            <div className={`${!menu ? 'hidden' : 'flex'} h-full w-full absolute top-0 left-0 overflow-hidden`}>
-                <div className='relative w-full h-full opacity-50 bg-black left-0 right-0 z-10'>
+                <div className={`${!menu ? 'hidden' : 'flex'} h-full w-full absolute top-0 left-0 overflow-hidden`}>
+                    <div className='relative w-full h-full opacity-50 bg-black left-0 right-0 z-10'>
 
-                </div>
-                <div className='absolute w-full sm:w-[300px] bg-white h-full opacity-100 top-0 right-0 z-20 p-3'>
-                    <div className='flex justify-between items-center px-3'>
-                        <p className='text-xl'>Menu</p>
-                        <IoMdClose onClick={handleMenu} className='cursor-pointer w-fit text-3xl sm:text-4xl text-gold bg-black text-white p-1 rounded-md font-bold mb-2' />
                     </div>
-                    <div className='p-3 border-t-2 border-gray-900'>
-                        <ul className='text-xl space-y-2 '>
-                            <li><a href="/">Home</a></li>
-                            <li><a href="/">Resume/Pause</a></li>
-                            <li><a href="/">Settings</a></li>
-                        </ul>
+                    <div className='absolute w-full sm:w-[300px] bg-white h-full opacity-100 top-0 right-0 z-20 p-3'>
+                        <div className='flex justify-between items-center px-3'>
+                            <p className='text-xl'>Menu</p>
+                            <IoMdClose onClick={handleMenu} className='cursor-pointer w-fit text-3xl sm:text-4xl text-gold bg-black text-white p-1 rounded-md font-bold mb-2' />
+                        </div>
+                        <div className='p-3 border-t-2 border-gray-900'>
+                            <ul className='text-xl space-y-2 '>
+                                <li><a href="/">Home</a></li>
+                                <li><a href="/">Resume/Pause</a></li>
+                                <li><a href="/">Settings</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        {!isLogin && <LoginModal/>}
+            {!isLogin && <LoginModal />}
+            {isTestEnd && <ExitModal/>}
         </div>
     )
 }
