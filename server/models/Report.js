@@ -29,6 +29,12 @@ const reportSchema = new Schema({
         type: String,
         require: true
     },
+    performance: {
+        type: String
+    },
+    improvement: {
+        type: String
+    },
     codeExecutionHistory: [{
         code: { type: String },
         message: { type: String },
@@ -53,9 +59,22 @@ const reportSchema = new Schema({
     }],
     status: {
         type: String,
-        enum: ['In-Progress', 'Failed', 'Passed'],
-        default: 'In-Progress',
+        enum: ['Failed', 'Passed'],
+        default: 'Failed',
         require: true
+    },
+    start_time: {
+        type: Date,
+        required: true
+    },
+    end_time: {
+        type: Date,
+        required: true
+    },
+    file: {
+        ref: 'reportFiles',
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
     }
 }, {
     timestamps: true

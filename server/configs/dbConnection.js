@@ -9,6 +9,7 @@ const connectToDatabase = (url)=>{
         const db = mongoose.connection;
 
         gridfsBucket = new mongoose.mongo.GridFSBucket(db.db, { bucketName: "testImages" });
+        gridfsBucketReport = new mongoose.mongo.GridFSBucket(db.db, { bucketName: "reportFiles" });
         console.log("✅ GridFSBucket Initialized Successfully");
 
         db.on("error", (err) => console.error("❌ MongoDB Connection Error:", err));
@@ -23,5 +24,11 @@ const getGridFSBucket = () => {
     }
     return gridfsBucket;
 };
+const getGridFSBuckeReport = () => {
+    if (!gridfsBucketReport) {
+        throw new Error("❌ GridFSBucket is not initialized yet. Wait for MongoDB connection.");
+    }
+    return gridfsBucketReport;
+};
 
-module.exports = {connectToDatabase, getGridFSBucket};
+module.exports = {connectToDatabase, getGridFSBucket, getGridFSBuckeReport};
