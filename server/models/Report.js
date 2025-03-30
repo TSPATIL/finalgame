@@ -1,39 +1,37 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const resultSchema = new Schema({
+const reportSchema = new Schema({
     userId: {
         ref: 'user',
         type: mongoose.Schema.Types.ObjectId,
         require: true
     },
-    testId: {
-        ref: 'test',
+    resultId: {
+        ref: 'result',
         type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        unique: true
+    },
+    name: {
+        type: String,
         require: true
     },
     title: {
-        type: String
+        type: String,
+        require: true
     },
     topic: {
-        type: String
+        type: String,
+        require: true
     },
     type: {
-        type: String
-    },
-    currentChallengeNo: {
-        type: Number,
-        default: 0
-    },
-    totalActualChallenges: {
-        type: Number,
-        required: true
+        type: String,
+        require: true
     },
     codeExecutionHistory: [{
-        code: {type: String},
-        output: {type: String},
-        message: {type: String},
-        executor: {type: String, enum: ['server', 'user']}
+        code: { type: String },
+        message: { type: String },
     }],
     challengesProgress: [{
         difficulty: {
@@ -45,7 +43,6 @@ const resultSchema = new Schema({
         answer: {
             type: String,
         },
-        previousDifficulty: [{ type: String }],
         pointsEarned: { type: Number },
         startTime: { type: Date, default: Date.now },
         endTime: { type: Date },
@@ -59,19 +56,10 @@ const resultSchema = new Schema({
         enum: ['In-Progress', 'Failed', 'Passed'],
         default: 'In-Progress',
         require: true
-    },
-    start_time: { type: Date, default: Date.now, required: true },
-    end_time: {
-        type: Date,
-        default: function () {
-            return new Date(this.start_time.getTime() + 24 * 60 * 60 * 1000);
-        },
-        required: true
-    },
-},
-    {
-        timestamps: true
-    });
+    }
+}, {
+    timestamps: true
+})
 
-const resultModel = mongoose.model('result', resultSchema);
-module.exports = resultModel;
+const reportModel = mongoose.model('report', reportSchema);
+module.exports = reportModel;

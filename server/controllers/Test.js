@@ -6,6 +6,7 @@ const userModel = require("../models/User")
 const { Readable } = require("stream");
 const resultModel = require("../models/Result");
 const { predictDifficulty } = require("./PredictDifficulty");
+const { compareQueryAndExecute, executeCode } = require("../compiler/postgre_sql/PostgreSQLCompiler");
 
 // const createTestStory = async (req, res) => {
 //     try {
@@ -435,8 +436,7 @@ const createTestResult = async (req, res) => {
         if (test.type !== req.params.type) {
             return res.status(400).json({ status: false, message: "Test not found", error: "Test not found" });
         }
-        const query = "";
-        const queryOutput = "";
+        
         const result = await resultModel({
             userId: user._id,
             testId: test._id,
@@ -444,17 +444,26 @@ const createTestResult = async (req, res) => {
             topic: test.topic,
             type: test.type,
             totalActualChallenges: test.challenges?.length || 0,
-            codeExecutionHistory: [{
-                code: query,
-                output: queryOutput,
-                executor: "server"
-            }],
             challengesProgress: [{
                 difficulty: "easy",
                 attempts: 0
             }]
         });
         const savedResult = await result.save();
+
+        const codeExecutionOutput = await executeCode(test.challenges[0].codeExecution, savedResult._id);
+        console.log(codeExecutionOutput)
+        await resultModel.findByIdAndUpdate(savedResult._id, {
+            $push: {  
+                [`codeExecutionHistory`]: {
+                    code: test.challenges[0].codeExecution,
+                    output: codeExecutionOutput.data,
+                    message: codeExecutionOutput.message,
+                    executor: "server"
+                },
+            }
+        })
+
         res.status(201).json({ status: true, message: "Test Session Created", resultId: savedResult._id });
     } catch (error) {
         console.error(error);
@@ -464,17 +473,17 @@ const createTestResult = async (req, res) => {
 
 const fetchTestCurrentChallenge = async (req, res) => {
     try {
-        const result = await resultModel.findById(req.params.resultId).select('currentChallengeNo testId totalActualChallenges codeExecutionHistory challengesProgress startTime'); 
+        const result = await resultModel.findById(req.params.resultId).select('currentChallengeNo testId totalActualChallenges codeExecutionHistory challengesProgress startTime');
         if (!result) {
             return res.status(400).json({ status: false, message: "Invalid Test Session ID", error: "Invalid Test Session ID" })
         }
-        if(result.currentChallengeNo === result.totalActualChallenges){
-            await resultModel.findByIdAndUpdate(req.params.resultId, {$set: {[`status`]: "Passed"}})
-            return res.status(200).json({status: true, message: "You have successfully completed the test."})
+        if (result.currentChallengeNo === result.totalActualChallenges) {
+            await resultModel.findByIdAndUpdate(req.params.resultId, { $set: { [`status`]: "Passed" } })
+            return res.status(200).json({ status: true, message: "You have successfully completed the test." })
         }
-        if((Date.now() - new Date(result.startTime).getTime()) > 24*60*60*1000){
-            await resultModel.findByIdAndUpdate(req.params.resultId, {$set: {[`status`]: "Failed"}})
-            return res.status(200).json({status: true, message: "You cannot complete test within time limit"});
+        if ((Date.now() - new Date(result.startTime).getTime()) > 24 * 60 * 60 * 1000) {
+            await resultModel.findByIdAndUpdate(req.params.resultId, { $set: { [`status`]: "Failed" } })
+            return res.status(200).json({ status: true, message: "You cannot complete test within time limit" });
         }
         const test = await storyTestModel.findOne(
             { _id: result.testId },
@@ -517,7 +526,7 @@ const submitChallenge = async (req, res) => {
         }
         const test = await storyTestModel.findOne(
             { _id: result.testId },
-            { 
+            {
                 challenges: { $slice: [result.currentChallengeNo, 1] },
             }
         )
@@ -528,25 +537,53 @@ const submitChallenge = async (req, res) => {
             return res.status(400).json({ status: false, message: "Challenge Not Found", error: "Challenge Not Found" })
         }
         const { question, answer, difficulty, constraints, keywords } = req.body;
-        const isCorrect = test.challenges[0].questions[difficulty === 'easy' ? 0 : difficulty === 'medium' ? 1 : 2].answer === answer
-        let updateQuery = {}
-        if(result.challengesProgress[result.currentChallengeNo]){
-            updateQuery.$inc = {[`challengesProgress.${result.currentChallengeNo}.attempts`]: 1};
+        // const isCorrect = test.challenges[0].questions[difficulty === 'easy' ? 0 : difficulty === 'medium' ? 1 : 2].answer === answer
+        const userQuery = answer;
+        const predefinedQuery = test.challenges[0].questions[difficulty === 'easy' ? 0 : difficulty === 'medium' ? 1 : 2].answer;
+        const response = await compareQueryAndExecute(userQuery, predefinedQuery, req.params.resultId);
+        let isCorrect = false;
+        console.log(response)
+        if (response.status) {
+            isCorrect = true;
         }
-        // else{
-        //     updateQuery.$push = {
-        //         challengesProgress: {
-        //             $each: [{
-        //                 difficulty: ['easy', 'medium', 'hard'][Math.floor(Math.random()*(2-0+1))+0],
-        //                 attempts: 1,
-        //             }],
-        //             $position: result.currentChallengeNo
-        //         }
-        //     }
-        // }
+        let updateQuery = {}
+        if (result.challengesProgress[result.currentChallengeNo]) {
+            updateQuery.$inc = { [`challengesProgress.${result.currentChallengeNo}.attempts`]: 1 };
+        }
+        else {
+            const currentTest = await storyTestModel.findOne(
+                { _id: result.testId },
+                {
+                    challenges: { $slice: [result.currentChallengeNo, 1] },
+                }
+            )
+
+            // const response = await predictDifficulty(result.challengesProgress);
+            // let difficulty = response.nextDifficulty;
+            // if (response.error) {
+            //     console.log(error);
+                let difficulty = result.challengesProgress[result.currentChallengeNo-1 || 0].difficulty
+            // }
+            const codeExecutionOutput = await executeCode(currentTest.challenges.codeExecution, req.params.resultId);
+            updateQuery.$push = {
+                [`codeExecutionHistory`]: {
+                    code: currentTest.challenges.codeExecution,
+                    output: codeExecutionOutput.data,
+                    message: codeExecutionOutput.message,
+                    executor: "server"
+                },
+                [`challengesProgress`]: {
+                    $each: [{
+                        difficulty: difficulty,
+                        attempts: 1,
+                    }],
+                    $position: result.currentChallengeNo
+                }
+            }
+        }
         await resultModel.findByIdAndUpdate(req.params.resultId, updateQuery);
         updateQuery = {}
-        if(isCorrect){
+        if (isCorrect) {
             const endDate = Date.now();
             updateQuery.$set = {
                 [`challengesProgress.${result.currentChallengeNo}.question`]: question,
@@ -561,53 +598,57 @@ const submitChallenge = async (req, res) => {
             updateQuery.$inc.currentChallengeNo = 1;
         }
         const query = answer;
-        const queryOutput = '';
+        const queryOutput = response.data;
         if (query) {
             updateQuery.$push = {};
             updateQuery.$push.codeExecutionHistory = {
                 code: query,
                 output: queryOutput,
+                message: response.message,
                 executor: "user"
             };
         }
         console.log(updateQuery);
         await resultModel.findByIdAndUpdate(req.params.resultId, updateQuery);
-        if(isCorrect){
-            if(result.currentChallengeNo + 1 < result.totalActualChallenges){
+        if (isCorrect) {
+            if (result.currentChallengeNo + 1 < result.totalActualChallenges) {
                 const nextTest = await storyTestModel.findOne(
                     { _id: result.testId },
-                    { 
-                        challenges: { $slice: [result.currentChallengeNo+1, 1] },
+                    {
+                        challenges: { $slice: [result.currentChallengeNo + 1, 1] },
                     }
                 )
-                
-                const response = await predictDifficulty(result.challengesProgress);
-                let difficulty = response.nextDifficulty;
-                if(response.error){
-                    console.log(error);
-                    difficulty = result.challengesProgress[result.currentChallengeNo].difficulty
-                }
+                console.log(nextTest.challenges[0])
+
+                // const response = await predictDifficulty(result.challengesProgress);
+                // let difficulty = response.nextDifficulty;
+                // if (response.error) {
+                //     console.log(error);
+                    let difficulty = result.challengesProgress[result.currentChallengeNo].difficulty
+                // }
+                const codeExecutionOutput = await executeCode(nextTest.challenges[0].codeExecution, req.params.resultId);
                 await resultModel.findByIdAndUpdate(req.params.resultId, {
                     $push: {
                         [`codeExecutionHistory`]: {
-                            code: nextTest.challenges.codeExecution,
-                            output: "",
-                            executer: "server"
+                            code: nextTest.challenges[0].codeExecution,
+                            output: codeExecutionOutput.data,
+                            message: codeExecutionOutput.message,
+                            executor: "server"
                         },
                         [`challengesProgress`]: {
                             $each: [{
                                 difficulty: difficulty,
-                                attempts: 1,
+                                attempts: 0,
                             }],
-                            $position: result.currentChallengeNo+1
+                            $position: result.currentChallengeNo + 1
                         }
                     }
                 });
             }
-            res.status(200).json({status: true, message: "Answer is correct"});
+            res.status(200).json({ status: true, message: "Answer is correct" });
         }
-        else{
-            res.status(200).json({status: true, message: "Answer is incorrect", error: "Answer is incorrect"});
+        else {
+            res.status(200).json({ status: true, message: "Answer is incorrect", error: "Answer is incorrect" });
         }
     } catch (error) {
         console.error(error);

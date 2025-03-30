@@ -325,32 +325,44 @@ export default function GameEditor() {
                         <div className='w-full h-[400px] lg:h-3/5 flex justify-center items-center px-2 py-1'>
                             <div className='w-full h-full bg-gray-800 overflow-auto border-[1px] rounded-lg border-white p-2'>
                                 <div className='text-lg text-white'>
-                                    {/* <p>Select * from Country;</p>
-                                <table className='mb-3 border-2 border-white'>
-                                    <tbody>
-                                        <tr className='border-2 border-white'>
-                                            <th  className='border-r-2 border-white'>Company</th>
-                                            <th  className='border-r-2 border-white'>Contact</th>
-                                            <th>Country</th>
-                                        </tr>
-                                        <tr className='border-2 border-white'>
-                                            <td className='border-r-2 border-white'>Alfreds Futterkiste</td>
-                                            <td className='border-r-2 border-white'>Maria Anders</td>
-                                            <td>Germany</td>
-                                        </tr>
-                                        <tr  className='border-2 border-white'>
-                                            <td className='border-r-2 border-white'>Centro comercial Moctezuma</td>
-                                            <td className='border-r-2 border-white'>Francisco Chang</td>
-                                            <td>Mexico</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis sed iusto nesciunt ab architecto omnis accusamus earum asperiores deleniti accusantium veniam nulla repudiandae consectetur modi rem aut voluptatibus, minus dignissimos tenetur! Possimus repudiandae voluptates ex minima quisquam cupiditate aliquid ab ipsum quam dolor eum ducimus aliquam a iusto, at reiciendis quos illum repellat voluptatem necessitatibus incidunt veritatis numquam. Harum aliquid assumenda voluptate, maiores exercitationem quaerat temporibus dolorem libero ipsa molestias quos dignissimos magni est amet, quae quod? Saepe, ex libero. */}
                                     {codeExecutionHistory.map((obj, index) => {
                                         return (
                                             <div key={obj + " " + index}>
-                                                <p>code: {obj.code}</p>
-                                                <p>output: {obj.output}</p>
+                                                <p>code: </p>
+                                                <div>{obj.code}</div>
+                                                <p>output:</p>
+                                                <div>
+                                                {
+                                                obj?.output && Array.isArray(JSON.parse(obj.output))
+                                                ?
+                                                <table className='mb-3 border-2 border-white text-center'>
+                                                    <thead>
+                                                {
+                                                    Object.keys(JSON.parse(obj.output)[0]).map(key => {
+                                                        return <td className='border-r-2 border-white p-1'>{key}</td>
+                                                    })
+                                                }
+                                                </thead>
+                                                <tbody>
+                                                {JSON.parse(obj.output).map((row)=>{
+                                                    console.log(row)
+                                                    return (
+                                                        <tr className='border-2 border-white'>
+                                                            {
+                                                                Object.keys(row).map(key => {
+                                                                    return <td className='border-r-2 border-white p-1'>{row[key]}</td>;
+                                                                })
+                                                            }
+                                                        </tr>
+                                                    )
+                                                })}
+                                                </tbody>
+                                                </table>
+                                                :
+                                                <div>{obj.output}</div>
+                                                }
+                                                </div>
+                                                <div>message: {obj.message}</div>
                                                 <p>executor: {obj.executor}</p>
                                             </div>
                                         )

@@ -50,7 +50,7 @@ insert into students (first_name, last_name, year_of_birth, role, gender) value 
 select * from students;
 
 -- for user
---easy, medium, hard
+-- easy, medium, hard
 select student_id from students where first_name = 'Harry';
 
 -- challenge 3
