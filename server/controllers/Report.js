@@ -76,9 +76,9 @@ const getReportData = async (req, res) => {
         if (!user) {
             return res.status(400).json({ status: false, message: "No test result found", error: "No test result found" });
         }
-        // if (req.user.uid !== user.firebaseId) {
-        //     return res.status(401).json({ status: false, message: "Unauthorized", error: "Unauthorized" });
-        // }
+        if (req.user.uid !== user.firebaseId) {
+            return res.status(401).json({ status: false, message: "Unauthorized", error: "Unauthorized" });
+        }
         const userName = user.profile.firstName + " " + user.profile.middleName + " " + user.profile.lastName;
         const { title, topic, type, testId, challengesProgress, codeExecutionHistory, status, start_time, end_time } = result;
 
@@ -104,7 +104,7 @@ const getReportData = async (req, res) => {
             body: JSON.stringify({
                 model: "llama-3.3-70b-versatile",
                 messages: [
-                    { role: "system", content: "Analyze the user's test performance and suggest areas of improvement. Give answer in json format like { user_performance: 'sentences' , improvement: 'sentences'}" },
+                    { role: "system", content: "Analyze the user's test performance and suggest areas of improvement. Give answer in json format like { user_performance: 'at least sentences' , improvement: 'at least 3 sentences'}" },
                     { role: "user", content: JSON.stringify({ title, topic, type, challengesProgress, codeExecutionProgress }) }
                 ],
                 max_tokens: 300
@@ -115,13 +115,13 @@ const getReportData = async (req, res) => {
 
         let feedback = {};
         try {
+            console.log(messageContent)
             const match = messageContent.match(/```json\s*([\s\S]*?)```/);
             if (match) {
                 const jsonContent = JSON.parse(match[1]); // Extracted JSON string
                 console.log(jsonContent);
                 feedback = jsonContent;
             } else {
-                console.log(jsonContent);
                 console.log("No JSON found");
             }
         } catch (error) {
@@ -147,8 +147,10 @@ const getReportData = async (req, res) => {
             testId,
             challengesProgress,
             codeExecutionHistory: codeExecutionProgress,
-            status,
+            status: 'Passed',
             start_time,
+            performance: userPerformance,
+            improvement: improvementSuggestions,
             end_time,
             file: fileId
         });
@@ -175,10 +177,9 @@ const getReportFile = async (req, res) => {
             return res.status(404).json({ status: false, message: "File not found" });
         }
         console.log(file)
-
-        const downloadStream = gridfsBucketReport.openDownloadStream(new mongoose.Types.ObjectId(fileId));
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename=${file[0].filename}`);
+        const downloadStream = gridfsBucketReport.openDownloadStream(new mongoose.Types.ObjectId(fileId));
         downloadStream.pipe(res);
         downloadStream.on("error", (err) => {
             res.status(500).json({ status: false, message: "Error streaming file", error: err });

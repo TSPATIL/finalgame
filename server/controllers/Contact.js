@@ -20,22 +20,16 @@ const addContact = async (req, res) => {
 }
 
 const deleteContact = async (req, res) => {
-    const token = req.body.token || req.headers.authorization.split(' ')[1];
     try {
-        const decodedToken = await admin.auth().verifyIdToken(token);
-
-        if (!decodedToken) {
-            return res.status(401).json({ error: 'Unauthorized' });
+        let user = await userModel.findOne({ email: req.user.email }).select('-password -_v');
+        if (!user) {
+            return res.status(400).json({ status: false, message: "No user exists", error: "No user exists" });
+        }
+        if (req.user.uid !== user.firebaseId) {
+            return res.status(401).json({ status: false, message: "Unauthorized", error: "Unauthorized" });
         }
 
-        const uid = decodedToken.uid;
-        
-        const checkUser = await userModel.findOne({firebaseId: uid}).select("email userType");
-        if (!checkUser) {
-            return res.status(400).json({ status: false, error: "User not found", message: "User not found" });
-        }
-        
-        if (checkUser.userType !== 'admin') {
+        if (user.userType !== 'admin') {
             return res.status(401).json({ status: false, error: "Unauthorized", message: "User not authorized to delete the contact" });
         }
         
@@ -53,50 +47,38 @@ const deleteContact = async (req, res) => {
 }
 
 const getAllContacts = async (req, res) => {
-    const token = req.body.token || req.headers.authorization.split(' ')[1];
     try {
-        const decodedToken = await admin.auth().verifyIdToken(token);
-
-        if (!decodedToken) {
-            return res.status(401).json({ status: false, error: 'Unauthorized', message: "User not authorised" });
+        let user = await userModel.findOne({ email: req.user.email }).select('-password -_v');
+        if (!user) {
+            return res.status(400).json({ status: false, message: "No user exists", error: "No user exists" });
+        }
+        if (req.user.uid !== user.firebaseId) {
+            return res.status(401).json({ status: false, message: "Unauthorized", error: "Unauthorized" });
         }
 
-        const uid = decodedToken.uid;
-        
-        const checkUser = await userModel.findOne({firebaseId: uid}).select("email userType");
-        if (!checkUser) {
-            return res.status(400).json({ status: false, error: "User not found", message: "User not found" });
-        }
-
-        if (checkUser.userType !== 'admin') {
+        if (user.userType !== 'admin') {
             return res.status(401).json({ status: false, error: "Unauthorized", message: "User not authorized to delete the contact" });
         }
 
         const contacts = await contactModel.find();
 
-        res.status(200).json({ status: true, contacts, message: "Contact Found" })
+        res.status(200).json({ status: true, contacts, message: "Contact Fetched" })
     } catch (error) {
         res.status(500).json({ status: false, error, message: "Something went wrong" });
     }
 }
 
 const getContactDetails = async (req, res) => {
-    const token = req.body.token || req.headers.authorization.split(' ')[1];
     try {
-        const decodedToken = await admin.auth().verifyIdToken(token);
-
-        if (!decodedToken) {
-            return res.status(401).json({ status: false, error: 'Unauthorized', message: "User not authorised" });
+        let user = await userModel.findOne({ email: req.user.email }).select('-password -_v');
+        if (!user) {
+            return res.status(400).json({ status: false, message: "No user exists", error: "No user exists" });
+        }
+        if (req.user.uid !== user.firebaseId) {
+            return res.status(401).json({ status: false, message: "Unauthorized", error: "Unauthorized" });
         }
 
-        const uid = decodedToken.uid;
-
-        const checkUser = await userModel.findOne({firebaseId: uid}).select("email userType");
-        if (!checkUser) {
-            return res.status(400).json({ status: false, error: "User not found", message: "User not found" });
-        }
-
-        if (checkUser.userType !== 'admin') {
+        if (user.userType !== 'admin') {
             return res.status(401).json({ status: false, error: "Unauthorized", message: "User not authorized to delete the contact" });
         }
 

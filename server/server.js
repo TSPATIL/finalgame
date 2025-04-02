@@ -30,6 +30,7 @@ app.use('/api/test', require('./routes/Test.js'));
 app.use('/api/contact', require('./routes/Contact.js'));
 app.use('/api/feedback', require('./routes/Feedback.js'));
 app.use('/api/report', require('./routes/Report.js'));
+app.use('/api/sitedetails', require('./routes/Admin.js'));
 
 // app.get('/api/execute', async (req, res)=>{
 //     try {

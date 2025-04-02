@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { lazy, Suspense } from 'react'
 import { FaGooglePlay } from "react-icons/fa";
 import { FaHome } from "react-icons/fa";
 
@@ -9,6 +9,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { showAlert } from '../Redux/features/Alerts/AlertSlice';
+const Footer = lazy(()=>import("./Footer"))
 
 const ProgressBar = ({ width }) => {
     return (
@@ -206,7 +207,7 @@ export default function ViewQuizUser() {
                                                             <p className='text-lg'>Topic: {result.topic}</p>
                                                             <p className='text-lg'>Type: {result.type}</p>
                                                             <p className='text-md text-red-600'>Due Date: {result.end_time}</p>
-                                                            <ProgressBar width={(result.currentChallengeNo) / result.totalActualChallenges * 100} />
+                                                            <ProgressBar width={Math.floor((result.currentChallengeNo) / result.totalActualChallenges * 100)} />
                                                             <Link to={`/user/editor/${result._id}`} className='w-full p-2 flex justify-center items-center text-[gold] bg-black font-bold rounded-lg'>Resume</Link>
                                                         </div>
                                                     )
@@ -229,7 +230,7 @@ export default function ViewQuizUser() {
                                                             <p className='text-3xl font-bold'>{result.title}</p>
                                                             <p className='text-lg'>Topic: {result.topic}</p>
                                                             <p className='text-lg'>Type: {result.type}</p>
-                                                            <Link to={`/user/editor/${result._id}`} className={`w-full p-2 flex justify-center items-center text-[gold] bg-black font-bold rounded-lg`}>View Result</Link>
+                                                            <Link to={`/report/${result._id}`} className={`w-full p-2 flex justify-center items-center text-[gold] bg-black font-bold rounded-lg`}>View Result</Link>
                                                         </div>
                                                     )
                                             })
@@ -242,6 +243,7 @@ export default function ViewQuizUser() {
                     </div>
                 </div>
             </div>
+            <Suspense fallback={<div>Component is loading please wait...</div>}><Footer/></Suspense>
         </div>
     )
 }

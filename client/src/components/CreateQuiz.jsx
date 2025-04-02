@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
-import ChallengeEditor from './ChallengeEditor';
+import React, { lazy, Suspense, useState } from 'react'
 import AdminNavbar from './AdminNavbar';
 import { useDispatch } from 'react-redux';
 import { addTestAsync } from '../Redux/features/Tests/TestsSlice';
 import { useNavigate } from 'react-router-dom';
 import { showAlert } from '../Redux/features/Alerts/AlertSlice';
+const ChallengeEditor = lazy(()=>import("./ChallengeEditor"))
 
 
 export default function CreateQuiz() {
@@ -139,7 +139,7 @@ export default function CreateQuiz() {
                         </div>
                     </div>
                     <hr className='bg-[white] h-[1px] w-5/6 mt-10 mb-7 mx-auto' />
-                    <ChallengeEditor challenges={challenges} setChallenges={setChallenges} handleSubmit={handleStorySubmit} />
+                    <Suspense fallback={<div>Component is loading please wait...</div>}><ChallengeEditor challenges={challenges} setChallenges={setChallenges} handleSubmit={handleStorySubmit} /></Suspense>
                 </div>
             </div>
         </div>

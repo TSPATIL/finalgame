@@ -165,7 +165,7 @@ body, html {
     position: relative;
     height: 100vh; /* Full viewport height */
     display: flex; /* Use flexbox for alignment */
-    justify-content: center; /* Center content horizontally */
+    justify-content: space-around; /* Center content horizontally */
     align-items: center; /* Center content vertically */
     overflow: hidden; /* Hide overflow for the diagonal effect */
 }
@@ -193,8 +193,7 @@ body, html {
 .hero-image {
     position: relative; /* Ensure the image is positioned above the background */
     z-index: 2; /* Ensure image is above the background */
-    max-width: 500px; /* Adjust max width as necessary */
-    margin-left: 20px; /* Add some margin for spacing */
+    max-width: 700px; /* Adjust max width as necessary */
 }
 
 .hero-image img {
@@ -292,6 +291,7 @@ body, html {
 
 .cta-btn:hover {
     color: #005f99; /* Slightly darker blue text on hover */
+    background-color: #9f6af5;
 }
 
 
@@ -353,6 +353,15 @@ body, html {
     z-index: 1; /* Ensure the heading is above the background */
 }
 
+.exploration p {
+    font-size: 1.5rem;
+    margin-bottom: 40px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    position: relative; /* For text layering above the background */
+    z-index: 1; /* Ensure the heading is above the background */
+}
+
 .explore-box {
     display: flex;
     margin: 20px 0;
@@ -364,7 +373,7 @@ body, html {
 
 .explore-image img {
     width: 100%;
-    max-width: 400px;
+    max-width: 500px;
     border-radius: 10px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -374,19 +383,21 @@ body, html {
     box-shadow: 0 0 20px rgba(67, 184, 216, 0.8); /* Golden glow effect */
 }
 
-.explore-content {
+.explore-content{
     max-width: 500px;
 }
 
 .explore-content h3 {
-    font-size: 1.5rem;
+    font-size: 2rem;
     color: #eee; /* Light gray for better contrast */
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
+    text-align: left;
 }
 
 .explore-content p {
-    font-size: 1rem;
+    font-size: 1.5rem;
+    text-align: justify;
     color: #ccc; /* Lighter gray for readability */
     font-family: 'Roboto', sans-serif;
 }
@@ -396,7 +407,7 @@ body, html {
 /* Call to Action Section */
 .cta-section {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     padding: 100px;
     position: relative; /* Position relative for the ::before pseudo-element */
     overflow: hidden; /* Hide overflow for the background animation */
@@ -445,7 +456,9 @@ body, html {
 
 .cta-text {
     z-index: 1;
+    width: 500px;
     padding: 0 20px; /* Ensure text is above the background */
+    color: gold
 }
 
 .cta-text h2 {
@@ -457,8 +470,10 @@ body, html {
 
 .cta-text p {
     margin-top: 20px;
-    color: #000000;
+    color: white;
     font-family: 'Roboto', sans-serif;
+    font-size: 1.5rem;
+    text-align: justify;
 }
 
 /* Footer */

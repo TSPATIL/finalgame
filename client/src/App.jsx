@@ -9,10 +9,6 @@ import {
 import { Suspense, lazy } from "react";
 
 const Signup = lazy(()=>import("./components/Signup"));
-const WelcomeNotice1 = lazy(()=>import("./components/WelcomeNotice1"));
-const WelcomeNotice2 = lazy(()=>import("./components/WelcomeNotice2"));
-const Loading = lazy(()=>import("./components/Loading"));
-const LetterNotice = lazy(()=>import("./components/LetterNotice"));
 const Contact = lazy(()=>import("./components/Contact"));
 const Profile = lazy(()=>import("./components/Profile"));
 const GameEditor = lazy(()=>import("./components/GameEditor"));
@@ -27,25 +23,12 @@ const UpdateQuiz = lazy(()=>import("./components/UpdateQuiz"));
 const ViewQuizAdmin = lazy(()=>import("./components/ViewQuizAdmin"));
 const ViewQuizUser = lazy(()=>import("./components/ViewQuizUser"));
 const ViewQuizDetails = lazy(()=>import("./components/ViewQuizDetails"));
+const Report = lazy(()=>import("./components/Report"));
+const ViewContacts = lazy(()=>import("./components/ViewContacts"));
+const ViewFeedback = lazy(()=>import("./components/ViewFeedback"));
+const About = lazy(()=>import("./components/About"));
 import Alert from "./components/Alert";
-// import Signup from "./components/Signup";
-// import { WelcomeNotice1 } from "./components/WelcomeNotice1";
-// import { WelcomeNotice2 } from "./components/WelcomeNotice2";
-// import Loading from "./components/Loading";
-// import LetterNotice from "./components/LetterNotice";
-// import Contact from "./components/Contact";
-// import Profile from "./components/Profile";
-// import GameEditor from "./components/GameEditor";
-// import AdminDashboard from "./components/AdminDashboard";
-// import AdminLogin from "./components/AdminLogin";
-// import AdminSignup from "./components/AdminSignup";
-// import AdminChangePassword from "./components/AdminChangePassword";
-// import CreateQuiz from "./components/CreateQuiz";
-// import Landingpage from "./components/Landingpage";
-// import Pagenotfound from "./components/Pagenotfound";
-// import UpdateQuiz from "./components/UpdateQuiz";
-// import ViewQuiz from "./components/ViewQuiz";
-// import ViewQuizDetails from "./components/ViewQuizDetails";
+import Spinner from "./components/Spinner";
 
 function App() {
   return (
@@ -53,26 +36,26 @@ function App() {
       <Router>
         <Alert/>
         <Routes>
-          <Route exact path="/" element={<Suspense fallback={<div>Component1 are loading please wait...</div>}><Landingpage/></Suspense>}></Route>
-          <Route exact path="/login" element={<Suspense fallback={<div>Component is loading please wait...</div>}><Login/></Suspense>}></Route>
-          <Route exact path="/signup" element={<Suspense fallback={<div>Component is loading please wait...</div>}><Signup/></Suspense>}></Route>
-          <Route exact path="/welcomenotice1" element={<Suspense fallback={<div>Component is loading please wait...</div>}><WelcomeNotice1/></Suspense>}></Route>
-          <Route exact path="/welcomenotice2" element={<Suspense fallback={<div>Component is loading please wait...</div>}><WelcomeNotice2/></Suspense>}></Route>
-          <Route exact path="/loading" element={<Suspense fallback={<div>Component is loading please wait...</div>}><Loading/></Suspense>}></Route>
-          <Route exact path="/notice" element={<Suspense fallback={<div>Component is loading please wait...</div>}><LetterNotice/></Suspense>}></Route>
-          <Route exact path="/contact" element={<Suspense fallback={<div>Component is loading please wait...</div>}><Contact/></Suspense>}></Route>
-          <Route exact path="/user/profile" element={<Suspense fallback={<div>Component is loading please wait...</div>}><Profile/></Suspense>}></Route>
-          <Route exact path="/user/editor/:id" element={<Suspense fallback={<div>Component is loading please wait...</div>}><GameEditor/></Suspense>}></Route>
-          <Route exact path="/user/view-quiz" element={<Suspense fallback={<div>Component is loading please wait...</div>}><ViewQuizUser/></Suspense>}></Route>
-          <Route exact path="/admin/admin-dashboard" element={<Suspense fallback={<div>Component is loading please wait...</div>}><AdminDashboard/></Suspense>}></Route>
-          <Route exact path="/admin/admin-login" element={<Suspense fallback={<div>Component is loading please wait...</div>}><AdminLogin/></Suspense>}></Route>
-          <Route exact path="/admin/admin-signup" element={<Suspense fallback={<div>Component is loading please wait...</div>}><AdminSignup/></Suspense>}></Route>
-          <Route exact path="/admin/change-password" element={<Suspense fallback={<div>Component is loading please wait...</div>}><AdminChangePassword/></Suspense>}></Route>
-          <Route exact path="/admin/create-quiz" element={<Suspense fallback={<div>Component is loading please wait...</div>}><CreateQuiz/></Suspense>}></Route>
-          <Route exact path="/admin/update-quiz/:id/:type" element={<Suspense fallback={<div>Component is loading please wait...</div>}><UpdateQuiz/></Suspense>}></Route>
-          <Route exact path="/admin/view-quiz/" element={<Suspense fallback={<div>Component is loading please wait...</div>}><ViewQuizAdmin/></Suspense>}></Route>
-          <Route exact path="/admin/view-quiz-details/:id/:type" element={<Suspense fallback={<div>Component is loading please wait...</div>}><ViewQuizDetails/></Suspense>}></Route>
-          <Route exact path="*" element={<Suspense fallback={<div>Component is loading please wait...</div>}><Pagenotfound/></Suspense>}></Route>
+          <Route exact path="/" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><Landingpage/></Suspense>}></Route>
+          <Route exact path="/login" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><Login/></Suspense>}></Route>
+          <Route exact path="/signup" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><Signup/></Suspense>}></Route>
+          <Route exact path="/about" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><About/></Suspense>}></Route>
+          <Route exact path="/contact" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><Contact/></Suspense>}></Route>
+          <Route exact path="/user/profile" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><Profile/></Suspense>}></Route>
+          <Route exact path="/user/editor/:id" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><GameEditor/></Suspense>}></Route>
+          <Route exact path="/user/view-quiz" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><ViewQuizUser/></Suspense>}></Route>
+          <Route exact path="/admin/admin-dashboard" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><AdminDashboard/></Suspense>}></Route>
+          <Route exact path="/admin/admin-login" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><AdminLogin/></Suspense>}></Route>
+          <Route exact path="/admin/admin-signup" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><AdminSignup/></Suspense>}></Route>
+          <Route exact path="/admin/change-password" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><AdminChangePassword/></Suspense>}></Route>
+          <Route exact path="/admin/create-quiz" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><CreateQuiz/></Suspense>}></Route>
+          <Route exact path="/admin/update-quiz/:id/:type" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><UpdateQuiz/></Suspense>}></Route>
+          <Route exact path="/admin/view-quiz/" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><ViewQuizAdmin/></Suspense>}></Route>
+          <Route exact path="/admin/view-quiz-details/:id/:type" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><ViewQuizDetails/></Suspense>}></Route>
+          <Route exact path="/admin/view-contacts" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><ViewContacts/></Suspense>}></Route>
+          <Route exact path="/admin/view-feedbacks" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><ViewFeedback/></Suspense>}></Route>
+          <Route exact path="/report/:id" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><Report/></Suspense>}></Route>
+          <Route exact path="*" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><Pagenotfound/></Suspense>}></Route>
         </Routes>
       </Router>
     </>

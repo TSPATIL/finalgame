@@ -1,128 +1,143 @@
-import React from 'react'
+import React, { lazy, Suspense, useEffect, useState } from 'react'
 import {
     Link
 } from 'react-router-dom'
 import AdminNavbar from './AdminNavbar'
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import Clock from './Clock';
+import { useDispatch } from 'react-redux';
+import { showAlert } from '../Redux/features/Alerts/AlertSlice';
+const Footer = lazy(() => import('./Footer'))
 
 export default function AdminDashboard() {
+    const [value, onChange] = useState(new Date());
+    const [userInfo, setUserInfo] = useState(0);
+    const [feedbackInfo, setFeedbackInfo] = useState([]);
+    const [resultInfo, setResultInfo] = useState(0);
+    const [testInfo, setTestInfo] = useState(0);
+    const [contactInfo, setContactInfo] = useState([]);
+    const dispatch = useDispatch();
+    useEffect(() => {
+        async function fetchDetails() {
+            try {
+                const response = await fetch("http://localhost:5000/api/sitedetails/getDetails", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                console.log(result)
+                if (result.status) {
+                    console.log(result)
+                    setUserInfo(result.userInfo);
+                    setFeedbackInfo(result.feedbackInfo);
+                    setResultInfo(result.resultInfo);
+                    setTestInfo(result.testInfo);
+                    setContactInfo(result.contactInfo);
+                    dispatch(showAlert({ message: result.message, type: "success" }));
+                }
+                else {
+                    dispatch(showAlert({ message: result.message, type: "error" }));
+                }
+            } catch (error) {
+                console.log(error)
+                dispatch(showAlert({ message: "Error Occurred", type: "error" }));
+            }
+        }
+        fetchDetails();
+    }, [])
+
     return (
         <div className='AdminDashboard'>
-                {/* <div class="flex justify-center items-center bg-gray-800 w-full h-screen">
-                    <div class="absolute top-0 left-0 sm:relative z-20 w-[90vw] sm:w-[300px] h-full bg-gray-900 rounded p-3 shadow-xl">
-                        <div class="flex items-center space-x-4 p-2 mb-5">
-                            <img class="h-12 rounded-full" src="/user.png" alt="James Bhatta" />
-                            <div>
-                                <h4 class="font-semibold text-lg text-white capitalize font-poppins tracking-wide">Tanmay Patil</h4>
-                                <p className='font-semibold text-base text-red-500 capitalize font-poppins tracking-wide'>admin</p>
+            <AdminNavbar />
+            <div className="bg-gray-800 w-full min-h-screen flex items-center justify-center pt-28 pb-5 md:pt-16">
+                <div className="w-full min-h-full z-10 md:ml-[300px] flex justify-center items-center flex-col px-10">
+                    <div className='w-full'>
+                        <h1 className='text-5xl font-bold text-white text-left'>Dashboard</h1>
+                    </div>
+                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 w-full gap-7 mt-5'>
+                        <Link className='p-5 bg-white flex justify-center items-start flex-col text-xl w-full rounded-md'>
+                            <div className='text-4xl font-bold'>{userInfo}</div>
+                            <div>Total Users</div>
+                        </Link>
+                        <Link to="/admin/view-quiz" className='p-5 bg-white flex justify-center items-start flex-col text-xl w-full rounded-md'>
+                            <div className='text-4xl font-bold'>{testInfo}</div>
+                            <div>Total Tests</div>
+                        </Link>
+                        <Link to="/admin/view-feedbacks" className='p-5 bg-white flex justify-center items-start flex-col text-xl w-full rounded-md'>
+                            <div className='text-4xl font-bold'>{feedbackInfo.length}</div>
+                            <div>Total Feedbacks</div>
+                        </Link>
+                        <Link to="/admin/view-contacts" className='p-5 bg-white flex justify-center items-start flex-col text-xl w-full rounded-md'>
+                            <div className='text-4xl font-bold'>{resultInfo}</div>
+                            <div>Total Test Given</div>
+                        </Link>
+                    </div>
+                    <hr className='w-full mt-5' />
+                    <div className='w-full flex justify-center items-center text-white text-lg mt-5 bg-gray-600'>
+                        <marquee behavior="scroll" direction="left" scrollamount={10}><span className='text-[gold] font-bold'>Notice:</span> All users are welcomed on our platform. Enjoy our different conditional tests.</marquee>
+                    </div>
+                    <hr className='w-full mt-5' />
+                    <div className='w-full grid grid-cols-1 lg:grid-cols-3 justify-items-stretch mt-5'>
+                        <div className='p-5 lg:border-x-2 lg:border-x-gray-30 flex justify-start items-start flex-col gap-3'>
+                            <Link to="/admin/view-feedback" className="text-2xl text-white font-bold hover:text-[gold]">Feedbacks</Link>
+                            <div className='flex justify-start items-center flex-col gap-3 w-full'>
+                            {
+                                feedbackInfo.length
+                                    ?
+                                    feedbackInfo.map((feedback, index) => {
+                                        if(index < 4)
+                                        return (
+                                            <div key={feedback + " " + index} className='flex justify-center w-full items-start flex-col text-black p-2 bg-white rounded-md'>
+                                                <p>ID: {feedback._id}</p>
+                                                <p>Rating: {feedback.rating}</p>
+                                                <p>Created At: {new Date(feedback.createdAt).toLocaleString()}</p>
+                                            </div>
+                                        )
+                                    })
+                                    :
+                                    <div className="text-white">No feedbacks from users yet.</div>
+                            }
                             </div>
                         </div>
-                        <ul class="space-y-2 text-sm">
-                            <li>
-                                <Link to="/admin/admin-dashboard" class="flex items-center space-x-3 text-gray-700 p-2 rounded-md font-medium hover:bg-gray-200 bg-gray-200 focus:shadow-outline">
-                                    <span class="text-gray-600">
-                                        <svg class="h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                        </svg>
-                                    </span>
-                                    <span>Dashboard</span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/admin/create-quiz" class="group flex items-center space-x-3 text-white hover:text-gray-700 p-2 rounded-md font-medium hover:bg-gray-200 focus:bg-gray-200 focus:shadow-outline">
-                                    <span class="text-[gold] group-hover:text-gray-600">
-                                        <svg class="h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                        </svg>
-                                    </span>
-                                    <span>Create Quiz</span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/admin/notifications" class="group flex items-center space-x-3 text-white hover:text-gray-700 p-2 rounded-md font-medium hover:bg-gray-200 focus:bg-gray-200 focus:shadow-outline">
-                                    <span class="text-[gold] group-hover:text-gray-600">
-                                        <svg class="h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                                        </svg>
-                                    </span>
-                                    <span>Notifications</span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/admin/user-messages" class="group flex items-center space-x-3 text-white hover:text-gray-700 p-2 rounded-md font-medium hover:bg-gray-200 focus:bg-gray-200 focus:shadow-outline">
-                                    <span class="text-[gold] group-hover:text-gray-600">
-                                        <svg class="h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-                                        </svg>
-                                    </span>
-                                    <span>User messages</span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/admin/profile" class="group flex items-center space-x-3 text-white hover:text-gray-700 p-2 rounded-md font-medium hover:bg-gray-200 focus:bg-gray-200 focus:shadow-outline">
-                                    <span class="text-[gold] group-hover:text-gray-600">
-                                        <svg class="h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
-                                    </span>
-                                    <span>My profile</span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/admin/settings" class="group flex items-center space-x-3 text-white hover:text-gray-700 p-2 rounded-md font-medium hover:bg-gray-200 focus:bg-gray-200 focus:shadow-outline">
-                                    <span class="text-[gold] group-hover:text-gray-600">
-                                        <svg class="h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
-                                        </svg>
-                                    </span>
-                                    <span>Settings</span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/admin/change-password" class="group flex items-center space-x-3 text-white hover:text-gray-700 p-2 rounded-md font-medium hover:bg-gray-200 focus:bg-gray-200 focus:shadow-outline">
-                                    <span class="text-[gold] group-hover:text-gray-600">
-                                        <svg class="h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                        </svg>
-                                    </span>
-                                    <span>Change password</span>
-                                </Link>
-                            </li>
-                            <li className="space-y-2 group">
-                                <Link to="/admin/admin-login" class="flex items-center space-x-3 text-white hover:text-gray-700 p-2 rounded-md font-medium hover:bg-gray-200 focus:bg-gray-200 focus:shadow-outline">
-                                    <span class="text-[gold]">
-                                        <svg class="h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                        </svg>
-                                    </span>
-                                    <span>Login</span>
-                                </Link>
-                                <Link to="/admin/admin-signup" class="hidden group-hover:flex items-center space-x-3 text-white hover:text-gray-700 p-2 rounded-md font-medium hover:bg-gray-200 focus:bg-gray-200 focus:shadow-outline">
-                                    <span class="text-gray-600">
-                                        <svg class="h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                        </svg>
-                                    </span>
-                                    <span>Signup</span>
-                                </Link>
-                                <Link to="/admin/admin-logout" class="hidden group-hover:flex items-center space-x-3 text-white hover:text-gray-700 p-2 rounded-md font-medium hover:bg-gray-200 focus:bg-gray-200 focus:shadow-outline">
-                                    <span class="text-gray-600">
-                                        <svg class="h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                        </svg>
-                                    </span>
-                                    <span>Logout</span>
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="w-full h-screen z-10">
-                        <div class="p-4 text-gray-500 overflow-auto h-[90vh]">
-                            
+                        <div className='p-5 flex justify-start items-start flex-col gap-3 border-t-2 border-t-gray-30 lg:border-t-0'>
+                            <Link to="/admin/view-contacts" className="text-2xl text-white font-bold hover:text-[gold]">User Messages</Link>
+                            <div className='flex justify-start items-start flex-col gap-3 w-full'>
+                            {
+                                contactInfo.length
+                                    ?
+                                    contactInfo.map((contact, index) => {
+                                        if(index < 4)
+                                        return (
+                                            <div key={contact + " " + index} className='flex justify-center w-full items-start flex-col text-black p-2 bg-white rounded-md'>
+                                                <p>Name: {contact.name}</p>
+                                                <p>email: {contact.email}</p>
+                                                <p>subject: {contact.subject}</p>
+                                                <p>Created At: {new Date(contact.createdAt).toLocaleString()}</p>
+                                            </div>
+                                        )
+                                    })
+                                    :
+                                    <div className="text-white">No user messages from users yet.</div>
+                            }
+                            </div>
+                        </div>
+                        <div className='p-5 flex justify-start items-start flex-col gap-7 lg:border-x-2 lg:border-x-gray-300 border-t-2 border-t-gray-30 lg:border-t-0'>
+                            <div className="text-2xl text-white font-bold">Date and Time</div>
+                            <div className='flex justify-center items-center gap-3 flex-col w-full'>
+                                <Clock />
+                                <Calendar className="bg-white" onChange={onChange} value={value} />
+                            </div>
                         </div>
                     </div>
-                </div> */}
-                <AdminNavbar/>
+                </div>
+            </div>
+            <div className='md:ml-[300px]'>
+                <Suspense fallback={<div>Component is loading please wait...</div>}><Footer /></Suspense>
+            </div>
         </div>
     )
 }

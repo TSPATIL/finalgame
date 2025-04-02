@@ -72,6 +72,7 @@ export default function ViewQuizAdmin() {
             return testId !== testNo;
           })
           setTests(newTest);
+          setFilteredTests(newTest);
           dispatch(showAlert({ message: "Test Deleted Successfully", type: "success" }))
         } catch (error) {
           console.log(error)

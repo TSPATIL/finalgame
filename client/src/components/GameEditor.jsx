@@ -208,7 +208,7 @@ export default function GameEditor() {
 
     const isLogin = useSelector(selectIsLogin)
     return (
-        <div>
+        <div className='GameEditor'>
             <div ref={appRef} id='GameEditor' className='GameEditor bg-gray-900 overflow-hidden'>
                 {isConfettiVisible && <Confetti className='w-full' numberOfPieces={500} />}
                 <div className='menu h-[80px] w-full flex justify-between items-center px-6'>

@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, lazy, Suspense } from 'react'
 import { IoIosAdd } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
 import { getUserDetailsAsync, selectIsLogin, selectLoading, updateUserDetailsAsync } from '../Redux/features/Authentication/AuthenticationSlice';
 import { showAlert } from "../Redux/features/Alerts/AlertSlice";
 import { useDispatch, useSelector } from 'react-redux';
 import LoginModal from './LoginModal';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Spinner from './Spinner';
+import { FaHome } from 'react-icons/fa';
+const Footer = lazy(()=>import("./Footer"));
 
 export default function Profile() {
     const [details, setDetails] = useState({ fname: '', mname: '', lname: '', email: '', phone: '', portfolio: '', date: '', gender: 'Male', image: null, bio: '', street: '', city: '', country: '', state: '', pincode: '', skills: [], links: [{ name: '', address: '' }], education: [{ degree: '', institute: '', startDate: '', endDate: '', status: 'pursuing' }] });
@@ -605,18 +607,18 @@ export default function Profile() {
     }
 
     return (
-        <div>
+        <div className="Profile">
             {
                 !loading
                     ?
                     <div>
                         <div className='Profile bg-gray-900 text-white flex justify-center items-center py-10'>
-                            <button onClick={() => { navigate('/') }} className='absolute top-20 text-white px-3 py-2 md:px-5 md:py-3 bg-blue-700 text-lg rounded-md left-[11%]' > Go Back</button>
-                            <button className='absolute top-20 text-white px-3 py-2 md:px-5 md:py-3 bg-blue-700 text-lg rounded-md right-[11%]'>Edit Details</button>
+                            {/* <button onClick={() => { navigate('/') }} className='absolute top-20 text-white px-3 py-2 md:px-5 md:py-3 bg-blue-700 text-lg rounded-md left-[11%]' > Go Back</button> */}
+                            <Link to="/" className='absolute top-20 text-white px-3 py-2 md:px-5 md:py-3 bg-transparent text-lg rounded-md right-[11%] flex justify-center items-center gap-3 border-2 border-[gold]'><FaHome/> Go Home</Link>
                             <form className='w-4/5' onSubmit={handleSubmit}>
-                                <div className='flex justify-center items-center'>
-                                    <img src={checkImage(details.image)} alt="image" className='w-36 h-36 rounded-full flex justify-center items-center border-4 border-yellow-500' />
-                                    <MdEdit onClick={() => { document.getElementById('image').click() }} className='cursor-pointer relative text-4xl top-10 -left-10 p-2 rounded-full text-white bg-slate-500' />
+                                <div className='flex justify-start md:justify-center items-center'>
+                                    <img src={checkImage(details.image)} alt="image" className='w-40 h-40 flex justify-center items-center border-4 border-yellow-500' />
+                                    <MdEdit onClick={() => { document.getElementById('image').click() }} className='cursor-pointer relative text-4xl top-20 -left-7 p-2 rounded-full text-black bg-[gold]' />
                                 </div>
                                 <div className='w-full mt-5'>
                                     <p className='text-2xl'>Personal Information</p>
@@ -817,6 +819,7 @@ export default function Profile() {
                         />
                     </div>
             }
+            <Suspense fallback={<div>Component is loading please wait...</div>}><Footer/></Suspense>
         </div>
     )
 }

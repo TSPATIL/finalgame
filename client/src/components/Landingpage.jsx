@@ -8,6 +8,7 @@ import { getUserDetailsAsync, logout, logoutUserAsync, selectIsLogin, selectUser
 import { signOutUser } from '../firebase/firebase-auth';
 import { showAlert } from '../Redux/features/Alerts/AlertSlice';
 import Footer from './Footer';
+import Music from './Music';
 
 export default function Landingpage() {
     document.querySelectorAll('.explore-image img, .hero-image img, .cta-image img').forEach(image => {
@@ -39,16 +40,6 @@ export default function Landingpage() {
     const isLogin = useSelector(selectIsLogin);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
-    // useEffect(() => {
-    //     const fetchUser = async () => {
-    //         if (isLogin) {
-    //             const response = await dispatch(getUserDetailsAsync());
-    //             const data = response.payload;
-    //         }
-    //     }
-    //     fetchUser();
-    // }, [isLogin])
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -104,14 +95,14 @@ export default function Landingpage() {
         }
     }
 
-
     return (
         <div>
             <header>
                 <nav className="navbar">
                     <div className="logo">QueryCraft</div>
                     <ul className="nav-links">
-                        <li><Link to="/user/profile">Home</Link></li>
+                        <li><Link to="/">Home</Link></li>
+                        <li><Link to="/user/profile">Profile</Link></li>
                         <li><Link to="/user/view-quiz">Game</Link></li>
                         {
                             !isLogin
@@ -129,10 +120,10 @@ export default function Landingpage() {
                 <div className="hero-text">
                     <h1>Welcome to the Wizarding World</h1>
                     <p>Explore the magical realm where enchantment and wonder unfold</p>
-                    <Link to="/signup" className="cta-btn">Discover the Magic</Link>
+                    <Link to="/user/view-quiz" className="cta-btn">Discover the Magic</Link>
                 </div>
                 <div className="hero-image">
-                    <img src="imagee1.jpg" alt="Wizarding World Castle" />
+                    <img src="image1.jpg" alt="Wizarding World Castle" className='w-[300px] h-[500px]' />
                 </div>
             </section>
 
@@ -151,12 +142,12 @@ export default function Landingpage() {
                 </div>
 
                 <div className="explore-box">
-                    <div className="explore-image">
-                        <img src="3.png" alt="Unlock the Wonders" />
-                    </div>
                     <div className="explore-content">
                         <h3>Unlock the Wonders</h3>
                         <p>Immerse yourself in the captivating narratives and awe-inspiring environments of the wizarding world. Discover the intricate tapestry of spells, creatures, and hidden treasures that await your exploration.</p>
+                    </div>
+                    <div className="explore-image">
+                        <img src="3.png" alt="Unlock the Wonders" />
                     </div>
                 </div>
             </section>
@@ -170,6 +161,7 @@ export default function Landingpage() {
                     <p>Immerse yourself in the captivating narratives and awe-inspiring environments of the wizarding world. Discover the intricate tapestry of spells, creatures, and hidden treasures that await your exploration.</p>
                 </div>
             </section>
+            <Music/>
             <Footer />
         </div>
     )
