@@ -7,6 +7,11 @@ const feedbackSchema = new Schema({
         ref: 'user',
         required: true
     },
+    resultId: {
+        type: Schema.Types.ObjectId,
+        ref: 'result',
+        required: true
+    },
     message: {
         type: String,
         trim: true,

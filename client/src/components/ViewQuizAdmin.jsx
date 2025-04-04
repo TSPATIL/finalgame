@@ -7,8 +7,10 @@ import {
   Link
 } from 'react-router-dom'
 import { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { showAlert } from '../Redux/features/Alerts/AlertSlice';
+import { selectIsLogin } from '../Redux/features/Authentication/AuthenticationSlice';
+import LoginModal from './LoginModal';
 
 export default function ViewQuizAdmin() {
   const [tests, setTests] = useState([]);
@@ -40,7 +42,8 @@ export default function ViewQuizAdmin() {
           dispatch(showAlert({ message: "Error Occured", type: "error" }))
         }
       }
-      fetchTests();
+      if(isLogin)
+        fetchTests();
   }, [])
 
 
@@ -80,6 +83,12 @@ export default function ViewQuizAdmin() {
         }
     }
   }
+
+  const isLogin = useSelector(selectIsLogin);
+        if(!isLogin){
+          return <LoginModal/>
+        }
+
   return (
     <div className='ViewQuizAdmin'>
       <AdminNavbar />
@@ -106,22 +115,22 @@ export default function ViewQuizAdmin() {
                         <div key={test + "" + testNo} className='w-full group h-full text-white flex items-center justify-center flex-col border-2 border-solid border-[gold] p-3 gap-3 text-lg'>
                           <div className='grid gap-3 lg:gap-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-items-start w-full h-full'>
                             <div className=''>
-                              <div>Sr. No.: {testNo+1}</div>
+                              <div><span className='text-xl font-bold'>Sr. No.:</span> {testNo+1}</div>
                             </div>
                             <div className=''>
-                              <div>Test id: {test._id}</div>
+                              <div><span className='text-xl font-bold'>Test id:</span> {test._id}</div>
                             </div>
                             <div className=''>
-                              <div>Title : {test.title}</div>
+                              <div><span className='text-xl font-bold'>Title:</span> {test.title}</div>
                             </div>
                             <div className=''>
-                              <div>Type: {test.type}</div>
+                              <div><span className='text-xl font-bold'>Type:</span> {test.type}</div>
                             </div>
                             <div className=''>
-                              <div>Access: {test.visibility}</div>
+                              <div><span className='text-xl font-bold'>Access:</span> {test.visibility}</div>
                             </div>
                             <div className=''>
-                              <div>Due Date: {test.testDueDate}</div>
+                              <div><span className='text-xl font-bold'>Due Date:</span> {test.testDueDate}</div>
                             </div>
                           </div>
                           <hr className='w-full bg-white hidden group-hover:block' />

@@ -111,7 +111,8 @@ export default function Landingpage() {
                                 :
                                 <li><button onClick={handleLogOut}>Logout</button></li>
                         }
-                        <li><Link to="contact">Contact</Link></li>
+                        <li><Link to="/contact">Contact</Link></li>
+                        <li><Link to="/about">About</Link></li>
                     </ul>
                 </nav>
             </header>

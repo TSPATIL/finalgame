@@ -235,7 +235,7 @@ const googleloginuser = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
     try {
-        const users = await userModel.find().select('-password');
+        const users = await userModel.find().select({_id: 1, "profile.firstName": 1, "profile.lastName": 1, "profile.middleName": 1, email: 1, firebaseId: 1, userType: 1, createdAt: 1});
         if (!users) {
             return res.status(400).json({ status: false, error: "No user exists" });
         }
@@ -396,7 +396,7 @@ const createAdmin = async (req, res)=>{
             sameSite: 'None' // Prevent cross-site request forgery
         });
 
-        return res.status(200).json({ message: 'Cookie set successfully', savedUser });
+        return res.status(200).json({ message: 'Cookie set successfully', user: savedUser });
     } catch (error) {
         await admin.auth().deleteUser(req.body.uid);
         console.error('Error verifying Firebase token:', error);
@@ -457,7 +457,7 @@ const loginAdmin = async (req, res)=>{
 
         delete existUser.password;
 
-        return res.status(200).json({ status: true, message: 'Cookie set successfully', existUser });
+        return res.status(200).json({ status: true, message: 'Cookie set successfully', user: existUser });
     }
     catch (error) {
         console.log(error)

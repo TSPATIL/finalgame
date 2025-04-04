@@ -7,8 +7,10 @@ import {
     useNavigate
 } from 'react-router-dom'
 import { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { showAlert } from '../Redux/features/Alerts/AlertSlice';
+import { selectIsLogin } from '../Redux/features/Authentication/AuthenticationSlice';
+import LoginModal from './LoginModal';
 const Footer = lazy(()=>import("./Footer"))
 
 const ProgressBar = ({ width }) => {
@@ -66,7 +68,8 @@ export default function ViewQuizUser() {
                 dispatch(showAlert({ message: "Error Occured", type: "error" }))
             }
         }
-        fetchTests();
+        if(isLogin)
+            fetchTests();
     }, []);
 
 
@@ -121,6 +124,11 @@ export default function ViewQuizUser() {
             }
         }
     }
+    
+      const isLogin = useSelector(selectIsLogin);
+            if(!isLogin){
+              return <LoginModal/>
+            }
 
     return (
         <div className='ViewQuizUser'>
@@ -159,22 +167,22 @@ export default function ViewQuizUser() {
                                                     <div key={test + "" + testNo} data-aos="fade-up" className='w-full group h-full bg-white text-black flex items-center justify-center flex-col border-2 border-solid p-3 gap-3 text-lg rounded-2xl'>
                                                         <div className='grid gap-3 lg:gap-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-items-start w-full h-full'>
                                                             <div className=''>
-                                                                <div>Sr. No.: {testNo + 1}</div>
+                                                                <div><span className='text-xl font-bold'>Sr. No.:</span> {testNo + 1}</div>
                                                             </div>
                                                             <div className=''>
-                                                                <div>Test id: {test._id}</div>
+                                                                <div><span className='text-xl font-bold'>Test id:</span> {test._id}</div>
                                                             </div>
                                                             <div className=''>
-                                                                <div>Title : {test.title}</div>
+                                                                <div><span className='text-xl font-bold'>Title:</span> {test.title}</div>
                                                             </div>
                                                             <div className=''>
-                                                                <div>Type: {test.type}</div>
+                                                                <div><span className='text-xl font-bold'>Type:</span> {test.type}</div>
                                                             </div>
                                                             <div className=''>
-                                                                <div>Topic: {test.topic.toUpperCase()}</div>
+                                                                <div><span className='text-xl font-bold'>Topic:</span> {test.topic.toUpperCase()}</div>
                                                             </div>
                                                             <div className=''>
-                                                                <div>Due Date: {test.testDueDate}</div>
+                                                                <div><span className='text-xl font-bold'>Due Date:</span> {test.testDueDate}</div>
                                                             </div>
                                                         </div>
                                                         <hr className='w-full bg-black hidden group-hover:block h-1' />
@@ -189,7 +197,7 @@ export default function ViewQuizUser() {
                                                 )
                                             })
                                             :
-                                            <div className='text-xl text-white'>No tests created</div>
+                                            <div className='text-xl text-white font-bold'>No tests created</div>
                                     }
                                 </div>
                             }
@@ -204,16 +212,16 @@ export default function ViewQuizUser() {
                                                     return (
                                                         <div key={result + " " + resultNo} className='card w-full bg-white h-full p-4 rounded-lg flex flex-col justify-center items-start gap-3 transition-all duration-500 hover:scale-105 cursor-pointer' title={`result_id: ${result._id}\ntest_id: ${result.testId}`}>
                                                             <p className='text-3xl font-bold'>{result.title}</p>
-                                                            <p className='text-lg'>Topic: {result.topic}</p>
-                                                            <p className='text-lg'>Type: {result.type}</p>
-                                                            <p className='text-md text-red-600'>Due Date: {result.end_time}</p>
+                                                            <p className='text-lg'><span className='font-bold'>Topic:</span> {result.topic}</p>
+                                                            <p className='text-lg'><span className='font-bold'>Type:</span> {result.type}</p>
+                                                            <p className='text-md text-red-600'><span className='font-bold'>Due Date:</span> {result.end_time}</p>
                                                             <ProgressBar width={Math.floor((result.currentChallengeNo) / result.totalActualChallenges * 100)} />
                                                             <Link to={`/user/editor/${result._id}`} className='w-full p-2 flex justify-center items-center text-[gold] bg-black font-bold rounded-lg'>Resume</Link>
                                                         </div>
                                                     )
                                             })
                                             :
-                                            <div className='text-xl text-white'>No tests created</div>
+                                            <div className='text-xl text-white font-bold'>No tests created</div>
                                     }
                                 </div>
                             }
@@ -228,14 +236,14 @@ export default function ViewQuizUser() {
                                                     return (
                                                         <div key={result + " " + resultNo} className={`card w-full  ${result.status === 'Passed' ? 'bg-green-600' : 'bg-red-600'} h-full p-4 rounded-lg flex flex-col justify-center items-start gap-3 transition-all duration-500 hover:scale-105 cursor-pointer`} title={`result_id: ${result._id}\ntest_id: ${result.testId}`}>
                                                             <p className='text-3xl font-bold'>{result.title}</p>
-                                                            <p className='text-lg'>Topic: {result.topic}</p>
-                                                            <p className='text-lg'>Type: {result.type}</p>
+                                                            <p className='text-lg'><span className='font-bold'>Topic:</span> {result.topic}</p>
+                                                            <p className='text-lg'><span className='font-bold'>Type:</span> {result.type}</p>
                                                             <Link to={`/report/${result._id}`} className={`w-full p-2 flex justify-center items-center text-[gold] bg-black font-bold rounded-lg`}>View Result</Link>
                                                         </div>
                                                     )
                                             })
                                             :
-                                            <div className='text-xl text-white'>No tests created</div>
+                                            <div className='text-xl text-white font-bold'>No tests created</div>
                                     }
                                 </div>
                             }

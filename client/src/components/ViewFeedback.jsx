@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { showAlert } from '../Redux/features/Alerts/AlertSlice';
 import AdminNavbar from './AdminNavbar';
 import { FaEye, FaStar } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
+import { selectIsLogin } from '../Redux/features/Authentication/AuthenticationSlice';
+import LoginModal from './LoginModal';
 
 export default function ViewFeedback() {
     const dispatch = useDispatch();
@@ -43,7 +45,8 @@ export default function ViewFeedback() {
                 dispatch(showAlert({ message: "Error Occurred", type: "error" }));
             }
         }
-        fetchFeedbacks();
+        if(isLogin)
+            fetchFeedbacks();
     }, []);
 
     const handleSearch = async (e) => {
@@ -105,6 +108,11 @@ export default function ViewFeedback() {
         )
     }
 
+    const isLogin = useSelector(selectIsLogin);
+          if(!isLogin){
+            return <LoginModal/>
+          }
+
     return (
         <div className='ViewFeedback'>
             {(!feedbackModal) ?
@@ -133,19 +141,19 @@ export default function ViewFeedback() {
                                                             <div key={feedback + "" + index} className='w-full rounded-md group h-full bg-white text-black flex items-center justify-center flex-col border-2 border-solid border-[gold] p-3 gap-3 text-lg'>
                                                                 <div className='grid gap-3 lg:gap-2 grid-cols-1 justify-items-start w-full h-full'>
                                                                     <div className=''>
-                                                                        <div>Sr. No.: {index + 1}</div>
+                                                                        <div><span className='text-xl font-bold'>Sr. No.:</span> {index + 1}</div>
                                                                     </div>
                                                                     <div className=''>
-                                                                        <div>Feedback id: {feedback.id}</div>
+                                                                        <div><span className='text-xl font-bold'>Feedback id:</span> {feedback.id}</div>
                                                                     </div>
                                                                     <div className=''>
-                                                                        <div>Ratings : {feedback.ratings}</div>
+                                                                        <div><span className='text-xl font-bold'>Ratings:</span> {feedback.ratings}</div>
                                                                     </div>
                                                                     <div className=''>
-                                                                        <div>Message: {feedback.message.length < 150 ? feedback.message : (feedback.message.slice(0, 150) + "...")}</div>
+                                                                        <div><span className='text-xl font-bold'>Message:</span> {feedback.message.length < 150 ? feedback.message : (feedback.message.slice(0, 150) + "...")}</div>
                                                                     </div>
                                                                     <div className=''>
-                                                                        <div>Created At: {feedback.createdAt}</div>
+                                                                        <div><span className='text-xl font-bold'>Created At:</span> {feedback.createdAt}</div>
                                                                     </div>
                                                                 </div>
                                                                 <hr className='w-full h-[2px] bg-black hidden group-hover:block' />

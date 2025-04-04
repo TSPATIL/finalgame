@@ -1,9 +1,11 @@
 import React, { lazy, Suspense, useState } from 'react'
 import AdminNavbar from './AdminNavbar';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addTestAsync } from '../Redux/features/Tests/TestsSlice';
 import { useNavigate } from 'react-router-dom';
 import { showAlert } from '../Redux/features/Alerts/AlertSlice';
+import { selectIsLogin } from '../Redux/features/Authentication/AuthenticationSlice';
+import LoginModal from './LoginModal';
 const ChallengeEditor = lazy(()=>import("./ChallengeEditor"))
 
 
@@ -89,6 +91,12 @@ export default function CreateQuiz() {
             dispatch(showAlert({ message: "Error occured", type: "error" }));
         }
     }
+
+    const isLogin = useSelector(selectIsLogin);
+    
+        if(!isLogin){
+            return <LoginModal/>
+        }
 
     return (
         <div className='CreateQuiz'>

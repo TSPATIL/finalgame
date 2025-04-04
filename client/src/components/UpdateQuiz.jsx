@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import AdminNavbar from './AdminNavbar'
 import ChallengeEditor from './ChallengeEditor'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateTestDetailsAsync } from '../Redux/features/Tests/TestsSlice';
 import { useNavigate, useParams } from 'react-router-dom';
 import { showAlert } from '../Redux/features/Alerts/AlertSlice';
 import {Buffer} from 'buffer'
+import { selectIsLogin } from '../Redux/features/Authentication/AuthenticationSlice';
+import LoginModal from './LoginModal'
 
 export default function UpdateQuiz() {
   const [test, setTest] = useState({ title: '', description: '', topic: 'sql', challenge: [], access: 'private', dueDate: '', type: 'story_learning' });
@@ -110,7 +112,8 @@ export default function UpdateQuiz() {
         dispatch(showAlert({ message: "Error Occured", type: "error" }))
       }
     }
-    fetchTestDetails();
+    if(isLogin)
+      fetchTestDetails();
   }, []);
 
   // const base64ToFile = (base64, fileName, mimeType = "image/png") => {
@@ -180,6 +183,12 @@ export default function UpdateQuiz() {
       dispatch(showAlert({ message: "Error occured", type: "error" }));
     }
   }
+
+  const isLogin = useSelector(selectIsLogin);
+  if(!isLogin){
+    return <LoginModal/>
+  }
+
   return (
     <div className='UpdateQuiz'>
       <AdminNavbar />

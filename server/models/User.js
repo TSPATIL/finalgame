@@ -26,7 +26,7 @@ const userSchema = new Schema({
         firstName: { type: String, minLength: 3, trim: true },
         middleName: { type: String, trim: true },
         lastName: { type: String, minLength: 3, trim: true },
-        gender: { type: String, enum: ['male', 'female', 'other'] },
+        gender: { type: String, default: 'male', enum: ['male', 'female', 'other'] },
         contact: {
             phone: { type: String, trim: true, minLength: 10, maxLength: 10 },
             portfolio: [{ type: String, trim: true }],

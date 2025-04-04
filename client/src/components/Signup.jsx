@@ -68,7 +68,6 @@ export default function Signup() {
   };
   const dispatch = useDispatch();
   const loading = useSelector(selectLoading);
-  // const user = useSelector(selectUser);
 
   const handleGoogleLogin = async () => {
     const result = await signInWithGoogle();
@@ -98,7 +97,6 @@ export default function Signup() {
       dispatch(showAlert({message: "User Sign-in failed", type: "error"}));
     }
   };
-  //   console.log(user);
   return (
     <div className="w-full h-full overflow-hidden bg-[#D06D6D]">
       <div className="flex justify-end items-center h-full w-full">

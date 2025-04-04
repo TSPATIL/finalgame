@@ -6,8 +6,10 @@ import AdminNavbar from './AdminNavbar'
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import Clock from './Clock';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { showAlert } from '../Redux/features/Alerts/AlertSlice';
+import { selectIsLogin } from '../Redux/features/Authentication/AuthenticationSlice';
+import LoginModal from './LoginModal';
 const Footer = lazy(() => import('./Footer'))
 
 export default function AdminDashboard() {
@@ -47,8 +49,15 @@ export default function AdminDashboard() {
                 dispatch(showAlert({ message: "Error Occurred", type: "error" }));
             }
         }
-        fetchDetails();
-    }, [])
+        if(isLogin)
+            fetchDetails();
+    }, []);
+
+    const isLogin = useSelector(selectIsLogin);
+
+    if(!isLogin){
+        return <LoginModal/>
+    }
 
     return (
         <div className='AdminDashboard'>
@@ -92,9 +101,9 @@ export default function AdminDashboard() {
                                         if(index < 4)
                                         return (
                                             <div key={feedback + " " + index} className='flex justify-center w-full items-start flex-col text-black p-2 bg-white rounded-md'>
-                                                <p>ID: {feedback._id}</p>
-                                                <p>Rating: {feedback.rating}</p>
-                                                <p>Created At: {new Date(feedback.createdAt).toLocaleString()}</p>
+                                                <p><span className='text-xl font-bold'>ID:</span> {feedback._id}</p>
+                                                <p><span className='text-xl font-bold'>Rating:</span> {feedback.rating}</p>
+                                                <p><span className='text-xl font-bold'>Created At:</span> {new Date(feedback.createdAt).toLocaleString()}</p>
                                             </div>
                                         )
                                     })
@@ -113,10 +122,10 @@ export default function AdminDashboard() {
                                         if(index < 4)
                                         return (
                                             <div key={contact + " " + index} className='flex justify-center w-full items-start flex-col text-black p-2 bg-white rounded-md'>
-                                                <p>Name: {contact.name}</p>
-                                                <p>email: {contact.email}</p>
-                                                <p>subject: {contact.subject}</p>
-                                                <p>Created At: {new Date(contact.createdAt).toLocaleString()}</p>
+                                                <p><span className='text-xl font-bold'>Name:</span> {contact.name}</p>
+                                                <p><span className='text-xl font-bold'>Email:</span> {contact.email}</p>
+                                                <p><span className='text-xl font-bold'>Subject:</span> {contact.subject}</p>
+                                                <p><span className='text-xl font-bold'>Created At:</span> {new Date(contact.createdAt).toLocaleString()}</p>
                                             </div>
                                         )
                                     })

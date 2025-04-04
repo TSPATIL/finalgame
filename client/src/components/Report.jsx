@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom'
 import { showAlert } from '../Redux/features/Alerts/AlertSlice';
 import {
@@ -15,6 +15,8 @@ import {
 import { Bar } from 'react-chartjs-2';
 import { FaHome } from 'react-icons/fa';
 import FeedbackModal from './FeedbackModal';
+import { selectIsLogin } from '../Redux/features/Authentication/AuthenticationSlice';
+import LoginModal from './LoginModal';
 const Footer = lazy(()=>import("./Footer"));
 
 ChartJS.register(
@@ -36,17 +38,33 @@ export default function Report() {
     const [labels, setLabels] = useState([]);
 
     const dispatch = useDispatch();
+    
+      const isLogin = useSelector(selectIsLogin);
+
+      const [feedbackModal,setFeedbackModal] = useState(false)
     useEffect(() => {
         async function fetchReport() {
             try {
-                const response = await fetch(`http://localhost:5000/api/report/get-report/${id}`, {
+                let response = await fetch(`http://localhost:5000/api/feedback/get-feedback-by-resultId/${id}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     credentials: 'include'
                 });
-                const result = await response.json();
+                let result = await response.json();
+                console.log(result)
+                if(!result.status){
+                    setFeedbackModal(true)
+                }
+                response = await fetch(`http://localhost:5000/api/report/get-report/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                });
+                result = await response.json();
                 if (result.status) {
                     setReport(result.data);
                     dispatch(showAlert({ message: result.message, type: "success" }));
@@ -64,8 +82,18 @@ export default function Report() {
                 dispatch(showAlert({ message: "Error occured", type: "error" }))
             }
         }
-        fetchReport();
+        if(isLogin)
+            fetchReport();
     }, [id, dispatch]);
+
+    
+    if(!isLogin){
+        return <LoginModal/>
+      }
+    if(feedbackModal){
+        return <FeedbackModal setFeedbackModal={setFeedbackModal} resultId = {id}/>
+      }
+
     return (
         <div className='Report'>
             <div className='w-full bg-gray-800 flex justify-end items-center pt-20 pb-5 px-28'>
@@ -160,7 +188,6 @@ export default function Report() {
                 </div>
             </div>
             <Suspense  fallback={<div>Component is loading please wait...</div>}><Footer/></Suspense>
-            <FeedbackModal/>
         </div>
     )
 }

@@ -15,8 +15,3 @@ Spinner.propTypes = {
   fontSize: PropTypes.string,
   color: PropTypes.string
 }
-
-// Spinner.defaultProps = {
-//   fontSize: '100px',
-//   color: 'black'
-// }

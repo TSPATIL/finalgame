@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import ChallengeEditor from './ChallengeEditor';
 import AdminNavbar from './AdminNavbar';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { showAlert } from '../Redux/features/Alerts/AlertSlice';
 import { useParams } from 'react-router-dom';
 import {Buffer} from 'buffer'
+import { selectIsLogin } from '../Redux/features/Authentication/AuthenticationSlice';
+import LoginModal from './LoginModal';
 
 export default function ViewQuizDetails() {
     const [test, setTest] = useState({ title: '', description: '', topic: 'sql', challenge: [], access: 'private', dueDate: '', type: 'Story-Based-Test' });
@@ -107,9 +109,15 @@ export default function ViewQuizDetails() {
                 dispatch(showAlert({ message: "Error Occured", type: "error" }))
             }
         }
-        fetchTestDetails();
+        if(isLogin)
+            fetchTestDetails();
     }, [])
 
+    
+      const isLogin = useSelector(selectIsLogin);
+            if(!isLogin){
+              return <LoginModal/>
+            }
 
     return (
         <div className='ViewQuizDetails'>

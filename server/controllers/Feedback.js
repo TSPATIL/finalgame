@@ -14,7 +14,8 @@ const addFeedback = async (req, res) => {
         const feedback = await feedbackModel({
             userId: user._id,
             message: req.body.message,
-            rating: req.body.ratings
+            rating: req.body.ratings,
+            resultId: req.body.resultId
         });
         await feedback.save();
         res.status(200).json({ status: true, message: "Feedback Saved Successfully" });
@@ -81,6 +82,26 @@ const getFeedbackByUserId = async (req, res) => {
     }
 }
 
+const getFeedbackByResultId = async (req, res) => {
+    try {
+        let user = await userModel.findOne({ email: req.user.email }).select('-password -_v');
+        if (!user) {
+            return res.status(400).json({ status: false, message: "No user exists", error: "No user exists" });
+        }
+        if (req.user.uid !== user.firebaseId) {
+            return res.status(401).json({ status: false, message: "Unauthorized", error: "Unauthorized" });
+        }
+        const feedbacks = await feedbackModel.findOne({ resultId: req.params.resultId });
+        if(feedbacks)
+            res.status(200).json({ status: true, message: "Feedback exists" });
+        else
+            res.status(200).json({ status: false, message: "Feedback does not exist" });
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: false, error, message: "Feedback unable to delete" });
+    }
+}
+
 const deleteFeedback = async (req, res) => {
     try {
         let user = await userModel.findOne({ email: req.user.email }).select('-password -_v');
@@ -100,4 +121,4 @@ const deleteFeedback = async (req, res) => {
     }
 }
 
-module.exports = { addFeedback, getAllFeedback, deleteFeedback, getFeedbackByFeedbackId, getFeedbackByUserId };
+module.exports = { addFeedback, getAllFeedback, deleteFeedback, getFeedbackByFeedbackId, getFeedbackByUserId, getFeedbackByResultId };

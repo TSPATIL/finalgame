@@ -29,6 +29,7 @@ const ViewFeedback = lazy(()=>import("./components/ViewFeedback"));
 const About = lazy(()=>import("./components/About"));
 import Alert from "./components/Alert";
 import Spinner from "./components/Spinner";
+const ViewUsers =lazy(()=>import("./components/ViewUsers"));
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
           <Route exact path="/admin/view-quiz-details/:id/:type" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><ViewQuizDetails/></Suspense>}></Route>
           <Route exact path="/admin/view-contacts" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><ViewContacts/></Suspense>}></Route>
           <Route exact path="/admin/view-feedbacks" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><ViewFeedback/></Suspense>}></Route>
+          <Route exact path="/admin/view-users" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><ViewUsers/></Suspense>}></Route>
           <Route exact path="/report/:id" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><Report/></Suspense>}></Route>
           <Route exact path="*" element={<Suspense fallback={<div className="flex justify-center items-center bg-white w-screen h-screen"><Spinner/></div>}><Pagenotfound/></Suspense>}></Route>
         </Routes>

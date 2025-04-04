@@ -3,7 +3,7 @@ import { FaStar } from "react-icons/fa";
 import { showAlert } from '../Redux/features/Alerts/AlertSlice';
 import { useDispatch } from 'react-redux';
 
-export default function FeedbackModal() {
+export default function FeedbackModal({setFeedbackModal, resultId}) {
     const [starArray, setStarArray] = useState(new Array(5).fill(''));
     const [ratings, setRatings] = useState(0);
     const [message, setMessage] = useState('');
@@ -19,19 +19,22 @@ export default function FeedbackModal() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({message, ratings}),
+                body: JSON.stringify({message, ratings, resultId}),
                 credentials: 'include'
             });
             const result = await response.json();
             if (result.status) {
                 dispatch(showAlert({ message: result.message, type: "success" }))
+                setFeedbackModal(false);
             }
             else {
                 dispatch(showAlert({ message: result.message, type: "error" }))
+                setFeedbackModal(true)
             }
         } catch (error) {
             console.error(error);
             dispatch(showAlert({ message: "Error occured", type: "error" }))
+            setFeedbackModal(true);
         }
     }
 

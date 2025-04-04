@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { showAlert } from '../Redux/features/Alerts/AlertSlice';
 import AdminNavbar from './AdminNavbar';
 import { FaEye } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
+import LoginModal from './LoginModal';
+import { selectIsLogin } from '../Redux/features/Authentication/AuthenticationSlice';
 
 export default function ViewContacts() {
     const dispatch = useDispatch();
@@ -46,7 +48,8 @@ export default function ViewContacts() {
                 dispatch(showAlert({ message: "Error Occurred", type: "error" }));
             }
         }
-        fetchContacts();
+        if(isLogin)
+            fetchContacts();
     }, []);
 
     const handleSearch = async (e) => {
@@ -108,6 +111,11 @@ export default function ViewContacts() {
         </div>
         )
     }
+    
+      const isLogin = useSelector(selectIsLogin);
+      if(!isLogin){
+        return <LoginModal/>
+      }
 
     return (
         <div className='ViewContacts'>
@@ -137,22 +145,22 @@ export default function ViewContacts() {
                                                     <div key={contact + "" + index} className='w-full rounded-md group h-full bg-white text-black flex items-center justify-center flex-col border-2 border-solid border-[gold] p-3 gap-3 text-lg'>
                                                         <div className='grid gap-3 lg:gap-2 grid-cols-1 justify-items-start w-full h-full'>
                                                             <div className=''>
-                                                                <div>Sr. No.: {index + 1}</div>
+                                                                <div><span className='text-xl font-bold'>Sr. No.:</span> {index + 1}</div>
                                                             </div>
                                                             <div className=''>
-                                                                <div>Contact id: {contact.id}</div>
+                                                                <div><span className='text-xl font-bold'>Contact id:</span> {contact.id}</div>
                                                             </div>
                                                             <div className=''>
-                                                                <div>Name : {contact.name}</div>
+                                                                <div><span className='text-xl font-bold'>Name:</span> {contact.name}</div>
                                                             </div>
                                                             <div className=''>
-                                                                <div>Email: {contact.email}</div>
+                                                                <div><span className='text-xl font-bold'>Email:</span> {contact.email}</div>
                                                             </div>
                                                             <div className=''>
-                                                                <div>Phone: {contact.phone}</div>
+                                                                <div><span className='text-xl font-bold'>Phone:</span> {contact.phone}</div>
                                                             </div>
                                                             <div className=''>
-                                                                <div>Created At: {contact.createdAt}</div>
+                                                                <div><span className='text-xl font-bold'>Created At:</span> {contact.createdAt}</div>
                                                             </div>
                                                         </div>
                                                         <hr className='w-full h-[2px] bg-black hidden group-hover:block' />

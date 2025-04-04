@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Link,
-    useLocation
+    useLocation,
+    useNavigate
 } from 'react-router-dom'
 import { AiOutlineMenu } from "react-icons/ai";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch, useSelector } from 'react-redux';
-import { logoutUserAsync, selectIsLogin, selectUser } from '../Redux/features/Authentication/AuthenticationSlice';
+import { getUserDetailsAsync, logoutUserAsync, selectIsLogin, selectUser } from '../Redux/features/Authentication/AuthenticationSlice';
 import { signOutUser } from '../firebase/firebase-auth';
 import { showAlert } from '../Redux/features/Alerts/AlertSlice';
 
@@ -16,7 +17,43 @@ export default function AdminNavbar() {
 
     const dispatch = useDispatch();
     const isLogin = useSelector(selectIsLogin);
-    const {user} = useSelector(selectUser);
+    const user = useSelector(selectUser);
+    const navigate = useNavigate();
+    console.log(user)
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await dispatch(getUserDetailsAsync());
+                const data = response.payload;
+                if (data.error === "Unauthorized: No auth token found" || data.error === 'Session expired. Please log in again.') {
+                    dispatch(logout());
+                    const result = await signOutUser();
+                    if (result.status) {
+                        dispatch(showAlert({ message: "Session expired. Please log in again.", type: "info" }));
+                        navigate('/admin/admin-login')
+                    } else {
+                        console.log(result.error)
+                        dispatch(showAlert({ message: "User logged out failed", type: "error" }));
+                    }
+                }
+                else if (data.status === false) {
+                    dispatch(showAlert({ message: data.error, type: "error" }));
+                }
+                else {
+                    console.log("hello")
+                    console.log(user)
+                    console.log(data);
+                }
+            } catch (error) {
+                dispatch(showAlert({ message: error.message, type: "error" }));
+            }
+        }
+        // if (isLogin && user.userType === 'student')
+        //     navigate('/');
+        if(isLogin)
+            fetchUser();
+    }, [isLogin])
 
     const handleLogOut = async (e) => {
         e.preventDefault();
@@ -48,13 +85,23 @@ export default function AdminNavbar() {
                     <div className='flex items-center justify-center space-x-4'>
                         <img className="h-12 rounded-full" src="/user.png" alt="James Bhatta" />
                         <div>
-                            <h4 className="font-semibold text-lg text-white capitalize font-poppins tracking-wide">{user.profile.firstName + " " + user.profile.lastName}</h4>
-                            <p className='font-semibold text-base text-red-500 capitalize font-poppins tracking-wide'>{user.userType}</p>
+                            <h4 className="font-semibold text-lg text-white capitalize font-poppins tracking-wide">{user ?  (user?.user?.profile?.firstName + " " + user?.user?.profile?.lastName) : 'Not Logged in'}</h4>
+                            <p className='font-semibold text-base text-red-500 capitalize font-poppins tracking-wide'>{user?.user?.userType || 'User Type'}</p>
                         </div>
                     </div>
                     <IoMdClose className='text-4xl text-[gold] block md:hidden cursor-pointer' onClick={() => setToggleNav(!toggleNav)} />
                 </div>
                 <ul className="space-y-2 text-sm">
+                    <li>
+                        <Link to="/" className={`group flex items-center space-x-3 ${location.pathname === '/' ? 'text-gray-700' : 'text-white'} hover:text-gray-700 p-2 rounded-md font-medium hover:bg-gray-200 ${location.pathname === '/' ? 'bg-gray-200' : ''} focus:bg-gray-200 focus:shadow-outline`}>
+                            <span className={`${location.pathname === "/" ? "text-gray-600" : "text-[gold]"} group-hover:text-gray-600`}>
+                                <svg className="h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </span>
+                            <span>Home</span>
+                        </Link>
+                    </li>
                     <li>
                         <Link to="/admin/admin-dashboard" className={`group flex items-center space-x-3 ${location.pathname === '/admin/admin-dashboard' ? 'text-gray-700' : 'text-white'} hover:text-gray-700 p-2 rounded-md font-medium hover:bg-gray-200 ${location.pathname === '/admin/admin-dashboard' ? 'bg-gray-200' : ''} focus:bg-gray-200 focus:shadow-outline`}>
                             <span className={`${location.pathname === "/admin/admin-dashboard" ? "text-gray-600" : "text-[gold]"} group-hover:text-gray-600`}>
@@ -63,6 +110,16 @@ export default function AdminNavbar() {
                                 </svg>
                             </span>
                             <span>Dashboard</span>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/admin/view-users" className={`group flex items-center space-x-3 ${location.pathname === '/admin/view-users' ? 'text-gray-700' : 'text-white'} hover:text-gray-700 p-2 rounded-md font-medium hover:bg-gray-200 ${location.pathname === '/admin/view-users' ? 'bg-gray-200' : ''} focus:bg-gray-200 focus:shadow-outline`}>
+                            <span className={`${location.pathname === "/admin/view-users" ? "text-gray-600" : "text-[gold]"} group-hover:text-gray-600`}>
+                                <svg className="h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </span>
+                            <span>View Users</span>
                         </Link>
                     </li>
                     <li>

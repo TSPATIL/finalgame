@@ -116,7 +116,7 @@ export const createAdminAsync = createAsyncThunk(
   async (adminDetails, { rejectWithValue }) => {
     try {
     const response = await createAdmin(adminDetails);
-    return response.data;
+    return response;
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -128,7 +128,7 @@ export const loginAdminAsync = createAsyncThunk(
   async (adminDetails, { rejectWithValue }) => {
     try{
     const response = await loginAdmin(adminDetails);
-    return response.data;
+    return response;
     }
     catch(error){
       return rejectWithValue(error);
