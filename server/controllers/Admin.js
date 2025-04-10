@@ -14,7 +14,7 @@ const getWebsiteInfo = async (req, res)=>{
             return res.status(401).json({ status: false, message: "Unauthorized", error: "Unauthorized" });
         }
         if (user.userType !== 'admin') {
-            return res.status(401).json({ status: false, error: "Unauthorized", message: "User not authorized to delete the contact" });
+            return res.status(401).json({ status: false, error: "Unauthorized", message: "User not authorized to access this information" });
         }
         const userInfo = await userModel.find().countDocuments();
         const feedbackInfo = await feedbackModel.find().select({_id: 1, rating: 1, createdAt: 1}).sort({createdAt: -1});

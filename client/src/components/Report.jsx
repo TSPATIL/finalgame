@@ -180,11 +180,12 @@ export default function Report() {
                     <p className='text-xl text-gray-300 text-justify'>{report?.performance || 'No overview'}</p>
                 </div>
                 <div className='my-5 text-2xl'>
-                    <p>Areas od Improvement:</p>
+                    <p>Areas of Improvement:</p>
                     <p className='text-xl text-gray-300 text-justify'>{report?.improvement || 'No improvements'}</p>
                 </div>
-                <div className='w-full flex justify-center items-center'>
+                <div className='w-full flex justify-center items-center gap-5'>
                     <a href={`http://localhost:5000/api/report/get-reportfile/${report?.file}`} download className='bg-gradient-to-b w-full flex justify-center items-center md:w-fit hover:bg-gradient-to-t px-10 py-3 text-xl from-blue-700 to-blue-800 rounded-md hover:scale-105 transition-all duration-200'>Download Report</a>
+                    <a href={`http://localhost:5000/api/report/get-certificatefile/${report?.certificate}`} download className='bg-gradient-to-b w-full flex justify-center items-center md:w-fit hover:bg-gradient-to-t px-10 py-3 text-xl from-blue-700 to-blue-800 rounded-md hover:scale-105 transition-all duration-200'>Download Certificate</a>
                 </div>
             </div>
             <Suspense  fallback={<div>Component is loading please wait...</div>}><Footer/></Suspense>

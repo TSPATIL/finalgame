@@ -4,8 +4,10 @@ const userModel = require("../models/User");
 const PDFDocument = require('pdfkit');
 const dotenv = require('dotenv');
 const { ChartJSNodeCanvas } = require('chartjs-node-canvas')
-const { getGridFSBuckeReport } = require("../configs/dbConnection");
+const { getGridFSBuckeReport, getGridFSBuckeCertificate } = require("../configs/dbConnection");
 const { mongoose } = require("mongoose");
+const path = require('path');
+const fs = require('fs');
 
 dotenv.config();
 
@@ -62,6 +64,51 @@ const generateReportPDF = async (challengeLabels, timeTakenData, attemptsTakenDa
     })
 }
 
+const generateCertificatePDF = async (userName, id) => {
+    return new Promise((resolve, reject) => {
+        const gridfsBucketCertificate = getGridFSBuckeCertificate();
+        if (!gridfsBucketCertificate) return reject("GridFSBucket not initialized");
+
+        const doc = new PDFDocument({
+            size: 'A4',
+            layout: 'landscape',
+            margin: 0
+        });
+
+        const writeStream = gridfsBucketCertificate.openUploadStream(`${id}_certificate.pdf`);
+        doc.pipe(writeStream);
+
+        //Adding certificate background image
+        const templatePath = path.join(__dirname, '../assets/certificate-template.png');
+        if (fs.existsSync(templatePath)) {
+            doc.image(templatePath, 0, 0, { width: doc.page.width, height: doc.page.height });
+        } else {
+            return reject("Certificate template image not found");
+        }
+
+        doc.registerFont('GreatVibes', path.join(__dirname, '../assets/font/GreatVibes-Regular.ttf'));
+
+        doc.font('GreatVibes')
+            .fontSize(52)
+            .fillColor('#a17b41')
+            .text(userName, 0, 230, { align: 'center' });
+
+        // doc.font('Times-Italic')
+        //     .fontSize(20)
+        //     .text(`For participation in "${title}"`, 0, 320, { align: 'center' });
+
+        // doc.fontSize(16)
+        //     .fillColor('#333')
+        //     .text(`Date: ${date.toDateString()}`, 0, 370, { align: 'center' });
+
+        doc.end();
+
+        writeStream.on('finish', () => resolve(writeStream.id));
+        writeStream.on('error', reject);
+    });
+};
+
+
 const getReportData = async (req, res) => {
     try {
         const report = await reportModel.findOne({ resultId: req.params.id });
@@ -117,6 +164,7 @@ const getReportData = async (req, res) => {
         try {
             console.log(messageContent)
             const match = messageContent.match(/```json\s*([\s\S]*?)```/);
+            console.log(match)
             if (match) {
                 const jsonContent = JSON.parse(match[1]); // Extracted JSON string
                 console.log(jsonContent);
@@ -136,6 +184,7 @@ const getReportData = async (req, res) => {
         const improvementSuggestions = feedback.improvement || "No improvement suggestions available.";
 
         const fileId = await generateReportPDF(challengeLabels, timeTakenData, attemptsTakenData, id = req.params.id, title, userName, topic, type, userPerformance, improvementSuggestions, start_time, status);
+        const certificateId = await generateCertificatePDF(userName, id=req.params.id);
 
         const newReport = await reportModel({
             name: userName,
@@ -152,7 +201,8 @@ const getReportData = async (req, res) => {
             performance: userPerformance,
             improvement: improvementSuggestions,
             end_time,
-            file: fileId
+            file: fileId,
+            certificate: certificateId
         });
         await newReport.save();
         res.status(200).json({ status: true, message: 'Report generated', data: newReport });
@@ -190,4 +240,32 @@ const getReportFile = async (req, res) => {
     }
 }
 
-module.exports = { getReportData, getReportFile }
+const getCertificateFile = async (req, res) => {
+    try {
+        const gridfsBucketCertificate = getGridFSBuckeCertificate();
+        if (!gridfsBucketCertificate) {
+            return res.status(500).json({ status: false, message: "GridFSBucket not initialized" });
+        }
+        const certificateId = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(certificateId)) {
+            return res.status(400).json({ status: false, message: "Invalid file ID" });
+        }
+        const file = await gridfsBucketCertificate.find({ _id: new mongoose.Types.ObjectId(certificateId) }).toArray();
+        if (!file || file.length === 0) {
+            return res.status(404).json({ status: false, message: "File not found" });
+        }
+        console.log(file)
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=${file[0].filename}`);
+        const downloadStream = gridfsBucketCertificate.openDownloadStream(new mongoose.Types.ObjectId(certificateId));
+        downloadStream.pipe(res);
+        downloadStream.on("error", (err) => {
+            res.status(500).json({ status: false, message: "Error streaming file", error: err });
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: false, message: "Internal server error", error });
+    }
+}
+
+module.exports = { getReportData, getReportFile, getCertificateFile }

@@ -75,6 +75,11 @@ const reportSchema = new Schema({
         ref: 'reportFiles',
         type: mongoose.Schema.Types.ObjectId,
         required: true
+    },
+    certificate: {
+        ref: 'certificateFiles',
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
     }
 }, {
     timestamps: true
