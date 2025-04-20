@@ -92,7 +92,7 @@ export default function AdminDashboard() {
                     <hr className='w-full mt-5' />
                     <div className='w-full grid grid-cols-1 lg:grid-cols-3 justify-items-stretch mt-5'>
                         <div className='p-5 lg:border-x-2 lg:border-x-gray-30 flex justify-start items-start flex-col gap-3'>
-                            <Link to="/admin/view-feedback" className="text-2xl text-white font-bold hover:text-[gold]">Feedbacks</Link>
+                            <Link to="/admin/view-feedbacks" className="text-2xl text-white font-bold hover:text-[gold]">Feedbacks</Link>
                             <div className='flex justify-start items-center flex-col gap-3 w-full'>
                             {
                                 feedbackInfo.length
