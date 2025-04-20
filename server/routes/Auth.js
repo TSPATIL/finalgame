@@ -12,7 +12,7 @@ router.route('/login-user').post(loginuser);
 router.route('/google-login-user').post(googleloginuser);
 router.route('/getallusers').get(verifyUser, getAllUsers);
 router.route('/getuserdetails').get(verifyUser, getUserSelf);
-router.route('/getuserdetailsbyadmin').get(verifyUser, getUserParam);
+router.route('/getuserdetailsbyadmin/:id').get(verifyUser, getUserParam);
 router.route('/logout').post(verifyUser, logout);
 router.route('/updateUserDetails').patch(upload.single('profile[image]'), verifyUser, updateUserSelf);
 router.route('/create-admin').post(createAdmin);

@@ -12,18 +12,10 @@ const feedbackSchema = new Schema({
         ref: 'result',
         required: true
     },
-    message: {
-        type: String,
-        trim: true,
+    feedback: {
+        type: Array,
         required: true
-    },
-    rating: {
-        type: Number,
-        min: 0,
-        max: 5,
-        default: 0,
-        required: true
-    },
+    }
 },
 {
     timestamps: true,

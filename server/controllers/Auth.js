@@ -269,17 +269,21 @@ const getUserSelf = async (req, res) => {
 
 const getUserParam = async (req, res) => {
     try {
-        const user = await userModel.findOne({ email: req.params.email }).select('-password -firebaseId');
+        let user = await userModel.findById(req.params.id).select('-password -_id -_v');
         if (!user) {
             return res.status(400).json({ status: false, error: "No user exists" });
         }
 
-        if (req.user.userType === 'student' || req.user.uid !== user.firebaseId) {
+        if (req.user.userType === 'student') {
             return res.status(401).json({ status: false, error: "Unauthorized" });
         }
+        console.log(user)
+        user = user.toObject();
+        console.log(user)
 
         res.status(200).json({ status: true, user, message: 'User details fetched successfully'});
     } catch (error) {
+        console.log(error)
         res.status(500).json({ status: false, error: "Something went wrong" });
     }
 }

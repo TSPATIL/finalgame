@@ -11,7 +11,7 @@ import { FaHome } from 'react-icons/fa';
 const Footer = lazy(()=>import("./Footer"));
 
 export default function Profile() {
-    const [details, setDetails] = useState({ fname: '', mname: '', lname: '', email: '', phone: '', portfolio: '', date: '', gender: 'Male', image: null, bio: '', street: '', city: '', country: '', state: '', pincode: '', skills: [], links: [{ name: '', address: '' }], education: [{ degree: '', institute: '', startDate: '', endDate: '', status: 'pursuing' }] });
+    const [details, setDetails] = useState({ fname: '', mname: '', lname: '', email: '', phone: '', portfolio: '', date: '', gender: 'Male', image: null, bio: '', street: '', city: '', country: 'India', state: 'Maharashtra', pincode: '', skills: [], links: [{ name: '', address: '' }], education: [{ degree: '', institute: '', startDate: '', endDate: '', status: 'pursuing' }] });
     const handleOnChange = (e) => {
         setDetails({ ...details, [e.target.name]: e.target.value });
         console.log(e.target.value);

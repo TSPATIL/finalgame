@@ -23,7 +23,7 @@ export default function AdminDashboard() {
     useEffect(() => {
         async function fetchDetails() {
             try {
-                const response = await fetch("http://localhost:5000/api/sitedetails/getDetails", {
+                const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/sitedetails/getDetails`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"

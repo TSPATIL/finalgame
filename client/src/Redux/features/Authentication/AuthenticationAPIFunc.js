@@ -1,7 +1,7 @@
 //user
 export function createUser(userData) {
     return new Promise(async (resolve, reject) => {
-        const response = await fetch("http://localhost:5000/api/user/create-user", {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/user/create-user`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -21,7 +21,7 @@ export function createUser(userData) {
 
 export function loginUser(userData) {
     return new Promise(async (resolve, reject) => {
-        const response = await fetch("http://localhost:5000/api/user/login-user", {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/user/login-user`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -41,7 +41,7 @@ export function loginUser(userData) {
 
 export function googleLoginUser(userData) {
     return new Promise(async (resolve, reject) => {
-        const response = await fetch("http://localhost:5000/api/user/google-login-user", {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/user/google-login-user`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -61,7 +61,7 @@ export function googleLoginUser(userData) {
 
 export async function logoutUser(){
     try {
-        const response = await fetch("http://localhost:5000/api/user/logout", {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/user/logout`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -81,7 +81,7 @@ export async function logoutUser(){
 
 export async function getAllUsers(){
     try {
-        const response = await fetch("http://localhost:5000/api/user/getallusers", {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/user/getallusers`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -104,7 +104,7 @@ export async function getAllUsers(){
 
 export async function getUserDetails(){
     try {
-        const response = await fetch("http://localhost:5000/api/user/getuserdetails", {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/user/getuserdetails`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -122,21 +122,20 @@ export async function getUserDetails(){
     }
 }
 
-export async function getUserDetailsByParams(){
+export async function getUserDetailsByParams(userId){
     try {
-        const response = await fetch("http://localhost:5000/api/user/getuserdetailsbyadmin", {
+        console.log(userId)
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/user/getuserdetailsbyadmin/${userId}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                // 'Authorization': `Bearer ${userData.token}`,
             },
-            body: JSON.stringify(userData),
             credentials: 'include'
         })
         const data = await response.json();
-
+        console.log(data)
         if (!response.ok) {
-            throw new Error(data.error || 'Login failed');
+            throw new Error(data.error || 'Information fetching failed');
         }
 
         return data;
@@ -150,7 +149,7 @@ export async function updateUserDetails(userData){
         for (let [key, value] of userData.entries()) {
             console.log(key, value);
         }
-        const response = await fetch("http://localhost:5000/api/user/updateUserDetails", {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/user/updateUserDetails`, {
             method: "PATCH",
             headers: {
                 // "Content-Type": "multipart/form-data",
@@ -174,7 +173,7 @@ export async function updateUserDetails(userData){
 //admin
 export async function createAdmin(adminDetails){
     try{
-        const response = await fetch("http://localhost:5000/api/user/create-admin", {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/user/create-admin`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -196,7 +195,7 @@ export async function createAdmin(adminDetails){
 
 export async function loginAdmin(adminDetails){
     try{
-        const response = await fetch("http://localhost:5000/api/user/login-admin", {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/user/login-admin`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -219,7 +218,7 @@ export async function loginAdmin(adminDetails){
 
 export async function logoutAdmin(){
     try{
-        const response = await fetch("http://localhost:5000/api/user/logout-admin", {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/user/logout-admin`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

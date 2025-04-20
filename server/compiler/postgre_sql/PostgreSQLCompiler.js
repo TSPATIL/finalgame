@@ -105,7 +105,7 @@ async function executeCode(code, resultId) {
         const queryResult = await pool.query(code);
         console.log(queryResult)
         console.log("Query executed successfully.");
-        const data = JSON.stringify(queryResult[2].rows);
+        const data = JSON.stringify(queryResult[queryResult.length > 0 ? queryResult.length-1 : queryResult?.length].rows);
         console.log(data)
         return { status: true, data, message: "Query executed successfully." };
     } catch (error) {
@@ -199,9 +199,11 @@ async function compareAndExecuteModification(userQuery, predefinedQuery, schema,
             console.log(userQuery.replace(';', '') + " RETURNING *;")
             userResult = await pool.query(userQuery.replace(';', '') + " RETURNING *;");
             await pool.query("ROLLBACK TO my_savepoint;");
+            console.log(userResult.rows);
             if (queryType === "insert") await pool.query(sequenceQuery);
             console.log(predefinedQuery.replace(';', '') + " RETURNING *;")
             let predefinedResult = await pool.query(predefinedQuery.replace(';', '') + " RETURNING *;");
+            console.log(predefinedResult.rows);
 
             if (JSON.stringify(userResult.rows) === JSON.stringify(predefinedResult.rows)) {
                 await pool.query("COMMIT");

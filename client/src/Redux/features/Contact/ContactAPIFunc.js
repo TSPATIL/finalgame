@@ -1,6 +1,6 @@
 export async function addContact(contactDetails) {
     try {
-        const response = await fetch("http://localhost:5000/api/contact/add-contact", {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/contact/add-contact`, {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
@@ -19,7 +19,7 @@ export async function addContact(contactDetails) {
 
 export async function getAllContacts() {
     try {
-        const response = await fetch("http://localhost:5000/api/contact/getAllContacts", {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/contact/getAllContacts`, {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",
@@ -38,7 +38,7 @@ export async function getAllContacts() {
 
 export async function deleteContact(contactId) {
     try {
-        const response = await fetch(`http://localhost:5000/api/contact/delete-contact/${contactId}`, {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/contact/delete-contact/${contactId}`, {
             method: 'DELETE',
             headers: {
                 "Content-Type": "application/json",
@@ -57,7 +57,7 @@ export async function deleteContact(contactId) {
 
 export async function getContactDetails(contactId) {
     try {
-        const response = await fetch(`http://localhost:5000/api/contact/getContactDeatils/${contactId}`, {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/contact/getContactDeatils/${contactId}`, {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",

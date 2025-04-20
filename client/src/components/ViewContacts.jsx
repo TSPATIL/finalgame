@@ -16,7 +16,7 @@ export default function ViewContacts() {
     useEffect(() => {
         async function fetchContacts() {
             try {
-                const response = await fetch("http://localhost:5000/api/contact/getAllContacts", {
+                const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/contact/getAllContacts`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -69,7 +69,7 @@ export default function ViewContacts() {
         const c = confirm("Are you sure to delete this record?");
         if(c){
             try {
-              const response = await fetch(`http://localhost:5000/api/contact/delete-contact/${id}`, {
+              const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/contact/delete-contact/${id}`, {
                 method: 'DELETE',
                 headers: {
                   "Content-Type": "application/json"

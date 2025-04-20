@@ -21,7 +21,7 @@ export default function ViewQuizAdmin() {
   useEffect(() => {
       async function fetchTests () {
         try {
-          const response = await fetch("http://localhost:5000/api/test/get-all-test", {
+          const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/test/get-all-test`, {
             method: 'GET',
             headers: {
               "Content-Type": "application/json"
@@ -62,7 +62,7 @@ export default function ViewQuizAdmin() {
     const c = confirm("Are you sure to delete this record?");
     if(c){
         try {
-          const response = await fetch(`http://localhost:5000/api/test/delete-test/${id}/${type}`, {
+          const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/test/delete-test/${id}/${type}`, {
             method: 'DELETE',
             headers: {
               "Content-Type": "application/json"

@@ -92,7 +92,7 @@ export default function CreateChallenge({ challenges, setChallenges, type = 'Cre
     const checkImage = (image) => {
         if (image) {
             if (typeof image === 'string') {
-                return `http://localhost:5000/api/test/image/${image}`;
+                return `${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/test/image/${image}`;
             }
             else {
                 return URL.createObjectURL(image);

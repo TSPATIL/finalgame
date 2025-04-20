@@ -3,7 +3,7 @@ export async function addTest(testDetails) {
         for (let [key, value] of testDetails.entries()) {
             console.log(key, value);
         }
-        const response = await fetch("http://localhost:5000/api/test/add-test-story", {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/test/add-test-story`, {
             method: 'POST',
             headers: {
                 // "Content-Type": "multipart/form-data",
@@ -27,7 +27,7 @@ export async function updateTestDetails(testID, testType, testDetails) {
         for (let [key, value] of testDetails.entries()) {
             console.log(key, value);
         }
-        const response = await fetch(`http://localhost:5000/api/test/update-test/${testID}/${testType}`, {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/test/update-test/${testID}/${testType}`, {
             method: 'PUT',
             headers: {
                 // "Content-Type": "multipart/form-data",
@@ -48,7 +48,7 @@ export async function updateTestDetails(testID, testType, testDetails) {
 
 export async function deleteTest(testID) {
     try {
-        const response = await fetch(`http://localhost:5000/api/test/add-test-story/${testID}`, {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/test/add-test-story/${testID}`, {
             method: 'DELETE',
             headers: {
                 // "Content-Type": "multipart/form-data",
@@ -68,7 +68,7 @@ export async function deleteTest(testID) {
 
 export async function getAllTests() {
     try {
-        const response = await fetch(`http://localhost:5000/api/test/update-test-story/`, {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/test/update-test-story/`, {
             method: 'GET',
             headers: {
                 // "Content-Type": "multipart/form-data",
@@ -87,7 +87,7 @@ export async function getAllTests() {
 
 export async function getTestDetails(testID) {
     try {
-        const response = await fetch(`http://localhost:5000/api/test/update-test-story/${testID}`, {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/test/update-test-story/${testID}`, {
             method: 'GET',
             headers: {
                 // "Content-Type": "multipart/form-data",

@@ -16,7 +16,7 @@ export default function ViewFeedback() {
     useEffect(() => {
         async function fetchFeedbacks() {
             try {
-                const response = await fetch("http://localhost:5000/api/feedback//get-all-feedback", {
+                const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/feedback//get-all-feedback`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -25,16 +25,9 @@ export default function ViewFeedback() {
                 });
                 const result = await response.json();
                 if (result.status) {
-                    const feedbackData = result.feedbacks.map((feedback) => {
-                        return {
-                            id: feedback._id,
-                            ratings: feedback.rating,
-                            message: feedback.message,
-                            createdAt: new Date(feedback.createdAt).toLocaleString()
-                        }
-                    })
-                    setFeedbacks(feedbackData);
-                    setFilteredFeedbacks(feedbackData);
+                    console.log(result)
+                    setFeedbacks(result.feedbacks);
+                    setFilteredFeedbacks(result.feedbacks);
                     dispatch(showAlert({ message: result.message, type: "success" }));
                 }
                 else {
@@ -45,17 +38,16 @@ export default function ViewFeedback() {
                 dispatch(showAlert({ message: "Error Occurred", type: "error" }));
             }
         }
-        if(isLogin)
+        if (isLogin)
             fetchFeedbacks();
     }, []);
 
     const handleSearch = async (e) => {
         e.preventDefault();
         setFilteredFeedbacks(feedbacks.filter(feedback =>
-            feedback.ratings.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
             feedback.createdAt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            feedback.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            feedback.id.toLowerCase().includes(searchQuery.toLowerCase())
+            feedback.userId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            feedback._id.toLowerCase().includes(searchQuery.toLowerCase())
         ));
     }
 
@@ -63,7 +55,7 @@ export default function ViewFeedback() {
         const c = confirm("Are you sure to delete this record?");
         if (c) {
             try {
-                const response = await fetch(`http://localhost:5000/api/feedback/delete-feedback/${id}`, {
+                const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/feedback/delete-feedback/${id}`, {
                     method: 'DELETE',
                     headers: {
                         "Content-Type": "application/json"
@@ -93,25 +85,57 @@ export default function ViewFeedback() {
     const [feedbackModal, setFeedbackModal] = useState(false)
     let [feedbackViewNo, setFeedbackViewNo] = useState(-1);
 
-    const FeedbackModal = ({ contacts }) => {
+    const FeedbackModal = () => {
         return (
-            <div className='absolute z-30 top-0 left-0 w-full min-h-screen flex justify-center items-center bg-gray-800'>
-                <div onClick={() => setFeedbackModal(false)} className='w-screen h-screen relative z-40 bg-gray-600 opacity-20'></div>
-                <div className='bg-white absolute z-50 p-10 w-11/12 md:w-1/3 h-fit text-xl text-black shadow-lg rounded-md'>
-                    <p className='text-3xl text-black font-bold'>Feedback Details</p>
-                    <p className='my-2 flex justify-start items-center gap-2'><p>Feedback ID:</p> <p className='text-red-700'>{feedbacks[feedbackViewNo].id}</p></p>
-                    <p className='my-2 flex justify-start items-center gap-2'><p>Created At:</p> <p className='text-red-700'>{feedbacks[feedbackViewNo].createdAt}</p></p>
-                    <p className='my-2 flex justify-start items-center gap-2'><p>Ratings:</p> <p className='text-[purple] flex justify-center items-center'>{new Array(5).fill('').map((_, index) => <FaStar key={index} className={`text-3xl ${feedbacks[feedbackViewNo].ratings > index ? 'text-[gold]' : 'text-black'}`} />)}</p></p>
-                    <p className='my-2 flex justify-start items-start gap-2 text-justify'><p>Message:</p> <p className='text-blue-700'>{feedbacks[feedbackViewNo].message}</p></p>
+            <div className='w-full h-full flex justify-center items-center p-10 bg-gray-900'>
+                <div className='bg-white p-7 md:p-10 w-11/12 md:w-fit h-full text-xl text-black shadow-lg rounded-md flex justify-center items-center'>
+                    <div className='relative z-50 top-0 left-0 flex flex-col justify-start items-start gap-3 w-full h-full'>
+                        <h1 className='text-3xl font-bold mb-5'>Feedback Details</h1>
+                        {
+                            feedbacks[feedbackViewNo].feedback.map((section, sIndex) => {
+                                return (
+                                    <div key={section + " " + sIndex} className='w-full'>
+                                        <p className='mb-5 font-semibold text-2xl'>{(sIndex + 1) + ". " + section.section}</p>
+                                        <div className='space-y-5 w-full'>
+                                            {
+                                                section.type === 'array' &&
+                                                section.Questions.map((question, qIndex) => {
+                                                    return (
+                                                        <div key={question + " " + qIndex} className='flex justify-between items-center gap-5 text-justify'>
+                                                            <p title={`Rating\n1. Strongly Disagree\n2. Disagree\n3. Neutral\n4. Agree\n5. Strongly Agree`}>{(qIndex + 1) + ". " + question.question}</p>
+                                                            <p className='px-3 py-1 bg-gray-300'>{question.ratings}</p>
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+                                            {
+                                                section.type === 'bool' &&
+                                                <div className='flex justify-start items-center gap-5'>
+                                                    <p className='px-10 py-2 bg-gray-300'>{section.answer}</p>
+                                                </div>
+                                            }
+                                            {
+                                                section.type === 'text' &&
+                                                <div className='w-full'>
+                                                    <textarea required={true} value={section.answer} onChange={(e) => handleAnswerChange(e, sIndex)} className='w-full border-2 border-solid border-black rounded-md px-3 py-1 min-h-40 max-h-80' name="text" id="text" placeholder='Enter your suggestions here...'></textarea>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        }
+                        <button onClick={() => setFeedbackModal(false)} className='px-5 py-3 text-white text-center bg-black rounded-md w-full hover:bg-gray-700'>Close Feedback</button>
+                    </div>
                 </div>
-            </div>
+            </div >
         )
     }
 
     const isLogin = useSelector(selectIsLogin);
-          if(!isLogin){
-            return <LoginModal/>
-          }
+    if (!isLogin) {
+        return <LoginModal />
+    }
 
     return (
         <div className='ViewFeedback'>
@@ -144,13 +168,10 @@ export default function ViewFeedback() {
                                                                         <div><span className='text-xl font-bold'>Sr. No.:</span> {index + 1}</div>
                                                                     </div>
                                                                     <div className=''>
-                                                                        <div><span className='text-xl font-bold'>Feedback id:</span> {feedback.id}</div>
+                                                                        <div><span className='text-xl font-bold'>Feedback id:</span> {feedback._id}</div>
                                                                     </div>
                                                                     <div className=''>
-                                                                        <div><span className='text-xl font-bold'>Ratings:</span> {feedback.ratings}</div>
-                                                                    </div>
-                                                                    <div className=''>
-                                                                        <div><span className='text-xl font-bold'>Message:</span> {feedback.message.length < 150 ? feedback.message : (feedback.message.slice(0, 150) + "...")}</div>
+                                                                        <div><span className='text-xl font-bold'>User id:</span> {feedback.userId}</div>
                                                                     </div>
                                                                     <div className=''>
                                                                         <div><span className='text-xl font-bold'>Created At:</span> {feedback.createdAt}</div>
@@ -159,7 +180,7 @@ export default function ViewFeedback() {
                                                                 <hr className='w-full h-[2px] bg-black hidden group-hover:block' />
                                                                 <div className='hidden group-hover:flex justify-center items-center gap-5'>
                                                                     <button onClick={() => { setFeedbackModal(true); setFeedbackViewNo(index) }} className='px-5 py-2 bg-gradient-to-b from-blue-700 to-blue-900 rounded-md hover:bg-gradient-to-t text-white font-bold flex justify-center items-center gap-2'><FaEye className='text-xl' /><p className='hidden sm:block'>View</p></button>
-                                                                    <button onClick={() => deleteFeedback(feedback.id, index)} className='px-5 py-2 bg-gradient-to-b from-blue-700 to-blue-900 rounded-md hover:bg-gradient-to-t text-white font-bold flex justify-center items-center gap-2'><MdDelete className='text-xl' /><p className='hidden sm:block'>Delete</p></button>
+                                                                    <button onClick={() => deleteFeedback(feedback._id, index)} className='px-5 py-2 bg-gradient-to-b from-blue-700 to-blue-900 rounded-md hover:bg-gradient-to-t text-white font-bold flex justify-center items-center gap-2'><MdDelete className='text-xl' /><p className='hidden sm:block'>Delete</p></button>
                                                                 </div>
                                                             </div>
                                                         )

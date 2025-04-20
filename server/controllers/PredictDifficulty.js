@@ -1,12 +1,9 @@
 const mongoose = require("mongoose");
 const resultModel = require("../models/Result");
 
-const predictDifficulty = () => {
-    const timeTaken = 100000;
-    let difficulty = 'medium'
-    difficulty = difficulty === 'easy' ? 0 : difficulty === 'medium' ? 1 : 2;
-    const attempts = 2;
-
+const predictDifficulty = async (timeTaken, attempts, difficultyLevel) => {
+    difficulty = difficultyLevel === 'easy' ? 0 : difficultyLevel === 'medium' ? 1 : 2;
+    console.log({timeTaken, attempts, difficultyLevel})
     let n = 8;
 
     if(timeTaken <= 120000){

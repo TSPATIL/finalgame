@@ -7,7 +7,7 @@ export default function EditorInput({ startTime, pauseTime, resetTime, setAttemp
       <div className="w-full h-4/5 editor-container border border-gray-300 rounded-lg overflow-hidden transition duration-200">
         <Editor
           defaultLanguage="sql"
-          defaultValue="/* Write your code here */"
+          defaultValue="-- Write your code here"
           theme="vs-dark"
           options={{
             minimap: { enabled: false },

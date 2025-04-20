@@ -87,10 +87,11 @@ export const getUserDetailsAsync = createAsyncThunk(
 
 export const getUserDetailsByParamAsync = createAsyncThunk(
   "user/getUserDetailsByParam",
-  async (_, { rejectWithValue }) => {
+  async (userId, { rejectWithValue }) => {
     try{
-    const response = await getUserDetailsByParams(userData);
-    return response.data;
+    const response = await getUserDetailsByParams(userId);
+    console.log(response);
+    return response;
     }
     catch(error){
       return rejectWithValue(error);

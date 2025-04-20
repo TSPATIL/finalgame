@@ -61,7 +61,7 @@ export default function UpdateQuiz() {
   useEffect(() => {
     const fetchTestDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/test/get-test/${id}/${type}`, {
+        const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/test/get-test/${id}/${type}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'

@@ -45,7 +45,7 @@ export default function Report() {
     useEffect(() => {
         async function fetchReport() {
             try {
-                let response = await fetch(`http://localhost:5000/api/feedback/get-feedback-by-resultId/${id}`, {
+                let response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/feedback/get-feedback-by-resultId/${id}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ export default function Report() {
                 if(!result.status){
                     setFeedbackModal(true)
                 }
-                response = await fetch(`http://localhost:5000/api/report/get-report/${id}`, {
+                response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/report/get-report/${id}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -184,8 +184,8 @@ export default function Report() {
                     <p className='text-xl text-gray-300 text-justify'>{report?.improvement || 'No improvements'}</p>
                 </div>
                 <div className='w-full flex justify-center items-center gap-5'>
-                    <a href={`http://localhost:5000/api/report/get-reportfile/${report?.file}`} download className='bg-gradient-to-b w-full flex justify-center items-center md:w-fit hover:bg-gradient-to-t px-10 py-3 text-xl from-blue-700 to-blue-800 rounded-md hover:scale-105 transition-all duration-200'>Download Report</a>
-                    <a href={`http://localhost:5000/api/report/get-certificatefile/${report?.certificate}`} download className='bg-gradient-to-b w-full flex justify-center items-center md:w-fit hover:bg-gradient-to-t px-10 py-3 text-xl from-blue-700 to-blue-800 rounded-md hover:scale-105 transition-all duration-200'>Download Certificate</a>
+                    <a href={`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/report/get-reportfile/${report?.file}`} download className='bg-gradient-to-b w-full flex justify-center items-center md:w-fit hover:bg-gradient-to-t px-10 py-3 text-xl from-blue-700 to-blue-800 rounded-md hover:scale-105 transition-all duration-200'>Download Report</a>
+                    <a href={`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/report/get-certificatefile/${report?.certificate}`} download className='bg-gradient-to-b w-full flex justify-center items-center md:w-fit hover:bg-gradient-to-t px-10 py-3 text-xl from-blue-700 to-blue-800 rounded-md hover:scale-105 transition-all duration-200'>Download Certificate</a>
                 </div>
             </div>
             <Suspense  fallback={<div>Component is loading please wait...</div>}><Footer/></Suspense>

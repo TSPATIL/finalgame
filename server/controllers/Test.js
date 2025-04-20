@@ -436,7 +436,7 @@ const createTestResult = async (req, res) => {
         if (test.type !== req.params.type) {
             return res.status(400).json({ status: false, message: "Test not found", error: "Test not found" });
         }
-        
+
         const result = await resultModel({
             userId: user._id,
             testId: test._id,
@@ -454,7 +454,7 @@ const createTestResult = async (req, res) => {
         const codeExecutionOutput = await executeCode(test.challenges[0].codeExecution, savedResult._id);
         console.log(codeExecutionOutput)
         await resultModel.findByIdAndUpdate(savedResult._id, {
-            $push: {  
+            $push: {
                 [`codeExecutionHistory`]: {
                     code: test.challenges[0].codeExecution,
                     output: codeExecutionOutput.data,
@@ -558,12 +558,25 @@ const submitChallenge = async (req, res) => {
                 }
             )
 
-            // const response = await predictDifficulty(result.challengesProgress);
-            // let difficulty = response.nextDifficulty;
-            // if (response.error) {
-            //     console.log(error);
-                let difficulty = result.challengesProgress[result.currentChallengeNo-1 || 0].difficulty
-            // }
+            // let difficulty = await predictDifficulty( result.challengesProgress[result.currentChallengeNo-1].timeTaken, result.challengesProgress[result.currentChallengeNo-1].attempts, result.challengesProgress[result.currentChallengeNo-1].difficulty);
+            // // let difficulty = response.nextDifficulty;
+            // // if (response.error) {
+            // //     console.log(error);
+            //     // let difficulty = result.challengesProgress[result.currentChallengeNo-1 || 0].difficulty
+            // // }
+            let difficulty = 'easy'; // default
+
+            const prevIndex = result.currentChallengeNo - 1;
+            const prevChallenge = result.challengesProgress[prevIndex];
+
+            if (prevChallenge && prevChallenge.timeTaken != null && prevChallenge.attempts != null && prevChallenge.difficulty) {
+                difficulty = await predictDifficulty(
+                    prevChallenge.timeTaken,
+                    prevChallenge.attempts,
+                    prevChallenge.difficulty
+                );
+            }
+
             const codeExecutionOutput = await executeCode(currentTest.challenges.codeExecution, req.params.resultId);
             updateQuery.$push = {
                 [`codeExecutionHistory`]: {
@@ -583,8 +596,8 @@ const submitChallenge = async (req, res) => {
         }
         await resultModel.findByIdAndUpdate(req.params.resultId, updateQuery);
         updateQuery = {}
+        const endDate = Date.now();
         if (isCorrect) {
-            const endDate = Date.now();
             updateQuery.$set = {
                 [`challengesProgress.${result.currentChallengeNo}.question`]: question,
                 [`challengesProgress.${result.currentChallengeNo}.answer`]: answer,
@@ -620,12 +633,15 @@ const submitChallenge = async (req, res) => {
                 )
                 console.log(nextTest.challenges[0])
 
-                // const response = await predictDifficulty(result.challengesProgress);
-                // let difficulty = response.nextDifficulty;
-                // if (response.error) {
-                //     console.log(error);
-                    let difficulty = result.challengesProgress[result.currentChallengeNo].difficulty
-                // }
+                // let difficulty = await predictDifficulty((Date.now() - new Date(result.challengesProgress[result.currentChallengeNo].startTime).getTime()), (result.challengesProgress[result.currentChallengeNo].attempts + 1), result.challengesProgress[result.currentChallengeNo].difficulty);
+                // let difficulty = result.challengesProgress[result.currentChallengeNo].difficulty
+                let difficulty = 'easy';
+                const current = result.challengesProgress[result.currentChallengeNo];
+                if (current && current.startTime && current.attempts != null && current.difficulty) {
+                    const timeTaken = endDate - new Date(current.startTime).getTime();
+                    difficulty = await predictDifficulty(timeTaken, current.attempts + 1, current.difficulty);
+                }
+                
                 const codeExecutionOutput = await executeCode(nextTest.challenges[0].codeExecution, req.params.resultId);
                 await resultModel.findByIdAndUpdate(req.params.resultId, {
                     $push: {

@@ -13,8 +13,7 @@ const addFeedback = async (req, res) => {
         console.log(req.body)
         const feedback = await feedbackModel({
             userId: user._id,
-            message: req.body.message,
-            rating: req.body.ratings,
+            feedback: req.body.feedback,
             resultId: req.body.resultId
         });
         await feedback.save();
@@ -56,7 +55,7 @@ const getFeedbackByFeedbackId = async (req, res) => {
         if (user.userType !== 'admin') {
             return res.status(401).json({ status: false, error: "Unauthorized", message: "User not authorized to delete the contact" });
         }
-        const feedbacks = await feedbackModel.findById(req.param.feedbackId);
+        const feedbacks = await feedbackModel.findById(req.params.feedbackId);
         res.status(200).json({ status: true, feedbacks, message: "Feedback fetched successfully" });
     } catch (error) {
         res.status(500).json({ status: false, error, message: "Feedback unable to delete" });
@@ -75,7 +74,7 @@ const getFeedbackByUserId = async (req, res) => {
         if (user.userType !== 'admin') {
             return res.status(401).json({ status: false, error: "Unauthorized", message: "User not authorized to delete the contact" });
         }
-        const feedbacks = await feedbackModel.findMany({ userId: req.param.userId });
+        const feedbacks = await feedbackModel.findMany({ userId: req.params.userId });
         res.status(200).json({ status: true, feedbacks, message: "Feedback fetched successfully" });
     } catch (error) {
         res.status(500).json({ status: false, error, message: "Feedback unable to delete" });

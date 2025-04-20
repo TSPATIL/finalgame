@@ -8,6 +8,7 @@ const { getGridFSBuckeReport, getGridFSBuckeCertificate } = require("../configs/
 const { mongoose } = require("mongoose");
 const path = require('path');
 const fs = require('fs');
+const QRCode = require('qrcode');
 
 dotenv.config();
 
@@ -46,17 +47,17 @@ const generateReportPDF = async (challengeLabels, timeTakenData, attemptsTakenDa
         doc.text(`Test status: ${status}`, {color: status === 'Failed' ? 'red': 'green'});
         doc.text(`Date of Test: ${start_time.toDateString()}`).moveDown();
 
-        doc.fontSize(16).text(`User Performance Details`, { underline: true }).moveDown();
-        doc.fontSize(12).text(userPerformance).moveDown();
-
-        doc.fontSize(16).text(`Areas of Improvement`, { underline: true }).moveDown();
-        doc.fontSize(12).text(improvementSuggestions).moveDown();
-
         doc.fontSize(16).text(`Time Taken Per Question`, { underline: true }).moveDown();
         doc.image(timeTakenChart, { width: 400, align: 'center' }).moveDown(310);
 
         doc.fontSize(16).text(`Attempts Per Question`, { underline: true }).moveDown();
         doc.image(attemptsTakenChart, { width: 400, align: 'center' }).moveDown(310);
+
+        doc.fontSize(16).text(`User Performance Details`, { underline: true }).moveDown();
+        doc.fontSize(12).text(userPerformance).moveDown();
+
+        doc.fontSize(16).text(`Areas of Improvement`, { underline: true }).moveDown();
+        doc.fontSize(12).text(improvementSuggestions).moveDown();
 
         doc.end();
         writeStream.on('finish', () => resolve(writeStream.id));
@@ -65,7 +66,7 @@ const generateReportPDF = async (challengeLabels, timeTakenData, attemptsTakenDa
 }
 
 const generateCertificatePDF = async (userName, id) => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         const gridfsBucketCertificate = getGridFSBuckeCertificate();
         if (!gridfsBucketCertificate) return reject("GridFSBucket not initialized");
 
@@ -100,6 +101,15 @@ const generateCertificatePDF = async (userName, id) => {
         // doc.fontSize(16)
         //     .fillColor('#333')
         //     .text(`Date: ${date.toDateString()}`, 0, 370, { align: 'center' });
+
+        // const certificateURL = `https://yourdomain.com/verify/${id}`;
+        // const qrCodeDataURL = await QRCode.toDataURL(certificateURL);
+
+        // // Convert base64 to buffer
+        // const qrCodeBuffer = Buffer.from(qrCodeDataURL.split(",")[1], 'base64');
+
+        // // Add QR to PDF (bottom right corner)
+        // doc.image(qrCodeBuffer, doc.page.width - 120, doc.page.height - 120, { width: 100 });
 
         doc.end();
 

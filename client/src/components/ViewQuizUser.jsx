@@ -37,7 +37,7 @@ export default function ViewQuizUser() {
     useEffect(() => {
         async function fetchTests() {
             try {
-                const response = await fetch(`http://localhost:5000/api/test/get-test-result`, {
+                const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/test/get-test-result`, {
                     method: 'GET',
                     headers: {
                         "Content-Type": "application/json"
@@ -107,7 +107,7 @@ export default function ViewQuizUser() {
     const startTestOnClick = async (type, testId) => {
         const c = confirm('Before starting note that "Story-Based-Test" have time bound of 24 hours. Make sure you complete the test within 24 hours');
         if (c) {
-            const response = await fetch(`http://localhost:5000/api/test/create-result/${testId}/${type}`, {
+            const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/test/create-result/${testId}/${type}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

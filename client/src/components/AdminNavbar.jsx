@@ -41,7 +41,6 @@ export default function AdminNavbar() {
                     dispatch(showAlert({ message: data.error, type: "error" }));
                 }
                 else {
-                    console.log("hello")
                     console.log(user)
                     console.log(data);
                 }

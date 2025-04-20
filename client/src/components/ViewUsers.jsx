@@ -18,7 +18,7 @@ export default function ViewUsers() {
     useEffect(() => {
         async function fetchUsers() {
             try {
-                const response = await fetch("http://localhost:5000/api/user/getallusers", {
+                const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/user/getallusers`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -58,7 +58,7 @@ export default function ViewUsers() {
         const c = confirm("Are you sure to delete this record?");
         if (c) {
             try {
-                const response = await fetch(`http://localhost:5000/api/user/delete-user/${id}`, {
+                const response = await fetch(`${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/api/user/delete-user/${id}`, {
                     method: 'DELETE',
                     headers: {
                         "Content-Type": "application/json"
@@ -137,7 +137,7 @@ export default function ViewUsers() {
                                                         </div>
                                                         <hr className='w-full h-[2px] bg-black hidden group-hover:block' />
                                                         <div className='hidden group-hover:flex justify-center items-center gap-5'>
-                                                            <Link to="/user/profile" className='px-5 py-2 bg-gradient-to-b from-blue-700 to-blue-900 rounded-md hover:bg-gradient-to-t text-white font-bold flex justify-center items-center gap-2'><FaEye className='text-xl' /><p className='hidden sm:block'>View</p></Link>
+                                                            <Link to={`/admin/view-users-profile/${user._id}`} className='px-5 py-2 bg-gradient-to-b from-blue-700 to-blue-900 rounded-md hover:bg-gradient-to-t text-white font-bold flex justify-center items-center gap-2'><FaEye className='text-xl' /><p className='hidden sm:block'>View</p></Link>
                                                             <button onClick={() => deleteUser(user._id, index)} className='px-5 py-2 bg-gradient-to-b from-blue-700 to-blue-900 rounded-md hover:bg-gradient-to-t text-white font-bold flex justify-center items-center gap-2'><MdDelete className='text-xl' /><p className='hidden sm:block'>Delete</p></button>
                                                         </div>
                                                     </div>

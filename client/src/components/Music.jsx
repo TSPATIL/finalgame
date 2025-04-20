@@ -6,7 +6,7 @@ export default function Music() {
     const handleMusicEnd = ()=>{
         const audio = document.getElementById('music');
         console.log(audio.src)
-        if(audio.src === 'http://localhost:5173/music1.mp3'){
+        if(audio.src === `${import.meta.env.VITE_WEBSITE_URL}:${import.meta.env.VITE_PORT}/music1.mp3`){
             audio.src = "music2.mp3"
         }
         else{
