@@ -159,8 +159,6 @@ To create a production build of the frontend:
 
 cd client
 npm run build
-📝 License
-This project is licensed under the MIT License.
 
 📬 Contact
 For issues or feature requests, please open an issue or contact the maintainer.
