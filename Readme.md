@@ -157,8 +157,10 @@ Hosting/Cloud: Firebase, Azure
 📦 Build for Production
 To create a production build of the frontend:
 
+```bash
 cd client
 npm run build
+```
 
 📬 Contact
 For issues or feature requests, please open an issue or contact the maintainer.
