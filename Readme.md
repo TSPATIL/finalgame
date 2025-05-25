@@ -1,6 +1,9 @@
-# MERN Stack Project
+# Query Craft
 
 A full-stack web application built using the **MERN stack** (MongoDB, Express.js, React, Node.js) with integrations including **Firebase Authentication**, **MongoDB Atlas**, and **Azure PostgreSQL**.
+
+Please visit this link for project explaination:-
+https://drive.google.com/file/d/1geJWT4IPUntVA5V0vlVsOCTkDWWG5HZT/view?usp=drive_link
 
 ---
 
