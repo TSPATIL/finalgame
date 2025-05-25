@@ -21,7 +21,15 @@ https://drive.google.com/file/d/1geJWT4IPUntVA5V0vlVsOCTkDWWG5HZT/view?usp=drive
 
 ## 📁 Folder Structure
 
-<pre> ``` project-root/ ├── client/ │ ├── .env │ └── ... (React frontend files) ├── server/ │ ├── .env │ ├── server.js │ └── configs/ │ └── final-project-9a212-firebase-adminsdk-4lbfq-7123055594.json └── README.md ``` </pre>
+project-root/
+├── client/ # React frontend
+│ └── .env # Frontend environment variables
+├── server/ # Express backend
+│ ├── .env # Backend environment variables
+│ ├── server.js # Entry point
+│ └── configs/
+│ └── final-project-9a212-firebase-adminsdk-4lbfq-7123055594.json
+└── README.md
 
 ---
 
