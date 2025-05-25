@@ -40,14 +40,18 @@ project-root/
 ```bash
 git clone https://github.com/your-username/your-repo-name.git
 cd your-repo-name
+```
 
-2. Setup Frontend (Client)
+### 2. Setup Frontend (Client)
 
+```bash
 cd client
 npm install
+```
 
 Create a .env file in the client/ directory:
 
+```env
 VITE_API_KEY=""
 VITE_AUTH_DOMAIN=""
 VITE_PROJECT_ID=""
@@ -57,16 +61,24 @@ VITE_APP_ID=""
 VITE_MEASUREMENT_ID=""
 VITE_PORT=5000
 VITE_WEBSITE_URL="http://localhost"
+```
+
 Start the frontend server:
 
+``` bash
 npm run dev
-3. Setup Backend (Server)
+```
 
+### 3. Setup Backend (Server)
+
+```bash
 cd server
 npm install
+```
 
 Create a .env file in the server/ directory:
 
+```env
 PORT=5000
 MONGO_URL=""
 API_URL="http://127.0.0.1:"
@@ -79,11 +91,14 @@ FIREBASE_API_KEY=""
 GROQ_API_KEY=""
 FRONTEND_URL="http://localhost"
 FRONTEND_PORT=5173
+```
+
 Add your Firebase Admin SDK file at:
 
 server/configs/final-project-9a212-firebase-adminsdk-4lbfq-7123055594.json
-With the following structure:
 
+With the following structure:
+```json
 {
   "type": "",
   "project_id": "",
@@ -97,9 +112,11 @@ With the following structure:
   "client_x509_cert_url": "",
   "universe_domain": ""
 }
+```
 Start the backend server:
-
+```bash
 npx nodemon server.js
+```
 ☁️ Cloud Setup Guide
 🔐 Firebase
 Visit Firebase Console
